@@ -4,6 +4,7 @@ package cliente;
 import java.awt.event.KeyEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.net.Socket;
 
 import javax.swing.JFrame;
@@ -60,8 +61,8 @@ public class Cliente extends JFrame implements Runnable {
 	            dataOutput = new DataOutputStream(socket.getOutputStream());
 	         
 	            /**
-	    	     * Recoge el texto del panel y lo envía por el socket.
-	    	     * El panel llamará a este método cuando el usuario escriba algo
+	    	     * Recoge el texto del panel y lo envï¿½a por el socket.
+	    	     * El panel llamarï¿½ a este mï¿½todo cuando el usuario escriba algo
 	    	     */
 	            textArea.addKeyListener(new KeyAdapter() {
 	    			@Override
@@ -90,7 +91,7 @@ public class Cliente extends JFrame implements Runnable {
    
 
 	    /**
-	     * Método run para antender al socket. Todo lo que llega por el socket se
+	     * Mï¿½todo run para antender al socket. Todo lo que llega por el socket se
 	     * escribe en el panel.
 	     */
 	    public void run() {
@@ -103,10 +104,18 @@ public class Cliente extends JFrame implements Runnable {
 	                String texto = dataInput.readUTF();
 	                textArea.setText(texto);
 	            }
-	        } catch (Exception e)
+	        }catch (EOFException e2)
 	        {
-	            e.printStackTrace();
+	            System.out.println(e2.getMessage());
+	        	
+	        } 
+	        
+	        catch (Exception e)
+	        {
+	        	System.out.println(e.getMessage());
+	        	
 	        }
+	        
 	    }
 	
 }

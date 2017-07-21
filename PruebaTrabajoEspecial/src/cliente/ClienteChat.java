@@ -31,7 +31,7 @@ public class ClienteChat
     }
 
     /**
-     * Crea la ventana, establece la conexión e instancia al controlador.
+     * Crea la ventana, establece la conexiï¿½n e instancia al controlador.
      */
     public ClienteChat()
     {
@@ -46,6 +46,7 @@ public class ClienteChat
         {
             e.printStackTrace();
         }
+       
     }
 
 

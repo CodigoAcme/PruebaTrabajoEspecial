@@ -20,16 +20,20 @@ public class EscuchaCliente extends Thread{
 	}
 	public void run(){
 		try {
-			if (!Server.listaClientesConectados.isEmpty()) {
-				for (EscuchaCliente socket : Server.listaClientesConectados) {
-					System.out.println("Esto llego: "+entrada.readUTF());
-					if (!socket.equals(s)) {	
-							if (!entrada.readUTF().isEmpty()) {
-								salida.writeUTF(entrada.readUTF());
+			 while (true)
+	            {	
+				if (!Server.listaClientesConectados.isEmpty()) {
+					for (EscuchaCliente socket : Server.listaClientesConectados) {
+						//System.out.println("Esto llego: "+entrada.readUTF());
+						//Server.textArea.append(entrada.readUTF());
+						if (!socket.equals(s)) {	
+								if (!entrada.readUTF().isEmpty()) {
+									salida.writeUTF(entrada.readUTF());
+								}
 							}
 						}
 					}
-				}
+	            }
 		} catch (Exception e) {
 			// TODO: handle exception
 		}

@@ -3,6 +3,8 @@ package servidor;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.net.Socket;
 
 import javax.swing.DefaultListModel;
@@ -56,19 +58,27 @@ public class HiloDeCliente implements Runnable, ListDataListener
         {
             while (true)
             {
-                String texto = dataInput.readUTF();
-                if (!texto.isEmpty()) {
+
+
+	                String texto = dataInput.readUTF();
 					
-				
-	                synchronized (charla)
-	                {
-	                    charla.addElement(texto);
-	                }
-                }
+		                synchronized (charla)
+		                {
+		                    charla.addElement(texto);
+		                }
+	                
+		
             }
-        } catch (Exception e)
+        } catch (EOFException e2)
         {
-            e.printStackTrace();
+            //System.out.println(e2.getMessage());
+            System.exit(1);
+            
+        }catch (IOException e)
+        {
+            //System.out.println(e.getMessage());
+            System.exit(2);
+            
         }
     }
 

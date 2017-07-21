@@ -27,7 +27,7 @@ public class Server extends Thread {
 	private static ServerSocket serverSocket;
 	private static Thread server;
 	private static int PUERTO=9000;
-	private static JTextArea textArea;
+	public static JTextArea textArea;
 	//private JPanel contentPane;
 
 	/**
@@ -85,7 +85,7 @@ public class Server extends Thread {
 		contentPane.add(scrollPane);
 		
 		textArea = new JTextArea();
-		textArea.setEditable(false);
+		//textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
 		
 		JButton btnConectar = new JButton("Conectar");
