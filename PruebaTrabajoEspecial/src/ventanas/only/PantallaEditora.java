@@ -16,6 +16,8 @@ import java.util.Scanner;
 import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class PantallaEditora {
 
@@ -45,7 +47,9 @@ public class PantallaEditora {
 	public PantallaEditora() {
 		initialize();
 	}
-
+	public JFrame getFrm(){
+		return this.frm;
+	}
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -61,6 +65,12 @@ public class PantallaEditora {
 		frm.getContentPane().add(scrollPane);
 		
 		textArea = new JTextArea();
+		textArea.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				textArea.append(System.lineSeparator()+System.lineSeparator());
+			}
+		});
 		scrollPane.setViewportView(textArea);
 		
 		textField = new JTextField();

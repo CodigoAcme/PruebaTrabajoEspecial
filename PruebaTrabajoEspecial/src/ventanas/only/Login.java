@@ -74,6 +74,7 @@ public class Login extends JFrame {
 				}
 				if(marca){
 					PantallaEditora pantalla = new PantallaEditora();
+					pantalla.getFrm().setVisible(true);
 					Login.this.dispose();
 				}
 				else {
@@ -87,7 +88,7 @@ public class Login extends JFrame {
 				
 			}
 		});
-		btnNewButton.setBounds(114, 228, 89, 23);
+		btnNewButton.setBounds(73, 228, 171, 23);
 		contentPane.add(btnNewButton);
 		
 		JButton btnNewButton_1 = new JButton("REGISTRARSE");
@@ -116,8 +117,8 @@ public class Login extends JFrame {
 							passwordField.setText("");
 						}
 						else {
-							System.out.println("INGRESE CONTRASEÑA");
-							ErrorDeSesion error = new ErrorDeSesion("INGRESE CONTRASEÑA");
+							System.out.println("INGRESE CONTRASEï¿½A");
+							ErrorDeSesion error = new ErrorDeSesion("INGRESE CONTRASEï¿½A");
 							error.setLocationRelativeTo(null);
 							error.setVisible(true);
 							textField.setText("");
@@ -149,21 +150,22 @@ public class Login extends JFrame {
 						}
 						
 						PantallaEditora pantalla = new PantallaEditora();
+						pantalla.getFrm().setVisible(true);
 						Login.this.dispose();
 						
 					}
 				}
 			}
 		});
-		btnNewButton_1.setBounds(256, 228, 89, 23);
+		btnNewButton_1.setBounds(256, 228, 126, 23);
 		contentPane.add(btnNewButton_1);
 		
 		JLabel lblUsuario = new JLabel("USUARIO");
-		lblUsuario.setBounds(64, 79, 66, 14);
+		lblUsuario.setBounds(28, 78, 66, 14);
 		contentPane.add(lblUsuario);
 		
 		JLabel lblContrasea = new JLabel("CONTRASE\u00D1A");
-		lblContrasea.setBounds(64, 143, 89, 14);
+		lblContrasea.setBounds(28, 142, 117, 14);
 		contentPane.add(lblContrasea);
 		
 		textField = new JTextField();

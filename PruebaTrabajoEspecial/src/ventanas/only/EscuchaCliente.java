@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
 public class EscuchaCliente extends Thread{
 	
@@ -24,6 +25,8 @@ public class EscuchaCliente extends Thread{
 	            {	
 				if (!Server.listaClientesConectados.isEmpty()) {
 					for (EscuchaCliente socket : Server.listaClientesConectados) {
+						
+					
 						//System.out.println("Esto llego: "+entrada.readUTF());
 						//Server.textArea.append(entrada.readUTF());
 						if (!socket.equals(s)) {	
@@ -31,13 +34,15 @@ public class EscuchaCliente extends Thread{
 									salida.writeUTF(entrada.readUTF());
 								}
 							}
+					}
 						}
 					}
-	            }
+	            
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 	}
+
 	public Socket getS() {
 		return s;
 	}

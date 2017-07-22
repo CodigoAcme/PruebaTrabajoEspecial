@@ -7,17 +7,22 @@ import java.awt.event.MouseEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.IOException;
 import java.net.Socket;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import java.awt.event.KeyAdapter;
+import java.awt.Cursor;
 import java.awt.GridLayout;
+import javax.swing.event.CaretListener;
+import javax.swing.event.CaretEvent;
 
-public class Cliente extends JFrame implements Runnable {
+public class Cliente_copia extends JFrame implements Runnable {
 
 	private JPanel contentPane;
 	
@@ -38,7 +43,9 @@ public class Cliente extends JFrame implements Runnable {
      * @param socket El socket
 	 * Create the frame.
 	 */
-	public Cliente(Socket socket) {
+	public Cliente_copia(Socket socket) {
+		String nombre=JOptionPane.showInputDialog("Ingresa tu nombre");
+		setTitle(nombre);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -47,14 +54,12 @@ public class Cliente extends JFrame implements Runnable {
 		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		textArea = new JTextArea();
+
+		
 		contentPane.add(textArea);
 		//ulti
-		textArea.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				textArea.append(System.lineSeparator()+System.lineSeparator());
-			}
-		});
+		
+		
 		//ulti
 	
 	    /**
@@ -108,8 +113,8 @@ public class Cliente extends JFrame implements Runnable {
 	        {
 	            while (true)
 	            {
-	            	 indice_ultima_linea = textArea.getDocument().getLength(); //retorna el numero de lineas
-					 textArea.setCaretPosition(indice_ultima_linea); //ubica el cursor al final
+	            	indice_ultima_linea = textArea.getDocument().getLength(); //retorna el numero de lineas
+					textArea.setCaretPosition(indice_ultima_linea); //ubica el cursor al final
 	                String texto = dataInput.readUTF();
 	                textArea.setText(texto);
 	                
