@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 import registros.DBusuarios;
 import registros.Usuario;
+import ventanas.only.Login;
 import ventanas.only.PantallaEditora;
 
 import javax.swing.JButton;
@@ -63,24 +64,33 @@ public class TestLogin extends JFrame {
 		contentPane.add(btnNewButton);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Prueba coneccion=new Prueba();
-				boolean resultado=coneccion.existeUsuario(textField.getText(), passwordField.getText().hashCode());
-				coneccion.desconectar();
-				if (resultado==true) {
-					JOptionPane.showMessageDialog(null, "Success!");
-					PantallaEditora pantalla = new PantallaEditora();
-					pantalla.getFrm().setVisible(true);
-					TestLogin.this.dispose();
+				
+	boolean marca = false;
+				
+				if(!textField.getText().isEmpty() && !passwordField.getText().isEmpty()){
+							marca = true;	
+						}
+				if(marca){
+					Prueba coneccion=new Prueba();
+					boolean resultado=coneccion.existeUsuario(textField.getText(), passwordField.getText().hashCode());
+					coneccion.desconectar();
+					if (resultado==true) {
+						//JOptionPane.showMessageDialog(null, "Success!");
+						PantallaEditora pantalla = new PantallaEditora();
+						pantalla.getFrm().setTitle("Usuario: "+textField.getText());
+						pantalla.getFrm().setVisible(true);
+						TestLogin.this.dispose();
+					}
+					else{
+						JOptionPane.showMessageDialog(null, "NO ESTA REGISTRADO! Intentalo nuevamente");
+						textField.setText("");
+						passwordField.setText("");
+						System.exit(ABORT);
+					}
 				}
-				else{
-					JOptionPane.showMessageDialog(null, "NO ESTA REGISTRADO!");
-					System.exit(ABORT);
-					
-				}
-				
-					
-				
-				
+				else {
+					JOptionPane.showMessageDialog(null, "Los campos no pueden quedar vacios!");
+				}	
 			}
 		});
 
@@ -96,12 +106,27 @@ public class TestLogin extends JFrame {
 		JButton btnNewButton_1 = new JButton("REGISTRARSE");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Prueba coneccion=new Prueba();
-				coneccion.agregarUsuario(textField.getText(), passwordField.getText().hashCode());
-				coneccion.listarUsuarios();
-				PantallaEditora pantalla = new PantallaEditora();
-				pantalla.getFrm().setVisible(true);
-				TestLogin.this.dispose();
+				
+boolean marca = false;
+				
+				if(!textField.getText().isEmpty() && !passwordField.getText().isEmpty()){
+							marca = true;	
+						}
+				if(marca){
+					
+						Prueba coneccion2=new Prueba();
+						coneccion2.agregarUsuario(textField.getText(), passwordField.getText().hashCode());
+						coneccion2.desconectar();
+						PantallaEditora pantalla2 = new PantallaEditora();
+						pantalla2.getFrm().setTitle("Usuario: "+textField.getText());
+						pantalla2.getFrm().setVisible(true);
+						TestLogin.this.dispose();
+					
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Los campos no pueden quedar vacios!");
+				}
+				
 			}
 		});
 	
