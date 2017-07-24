@@ -152,6 +152,9 @@ public class PantallaEditora {
 				if (rta==JOptionPane.YES_OPTION) {
 					JOptionPane.showMessageDialog(null, "Invitacion Enviada");
 					textField.setText("Cuando "+list.getSelectedValue()+ " se conecte, aca diría: "+list.getSelectedValue().toString()+" se conectó!");
+					PantallaEditora pantallaDeColaboracion=new PantallaEditora();
+					pantallaDeColaboracion.ponerEnTextArea(textArea.getText());
+					pantallaDeColaboracion.getFrm().setVisible(true);
 				}
 				if (rta==JOptionPane.CANCEL_OPTION) {
 					JOptionPane.showMessageDialog(null, "Invitacion cancelada");
@@ -230,12 +233,17 @@ public class PantallaEditora {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-////////////////////////////////////////////////////////////////////////////////////////////////////////////	
+	public void ponerEnTextArea(String loquevenga){
+		textArea.setText(loquevenga);
+	}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//NO
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	private void initialize() {
 		frm = new JFrame();
 	
-		frm.setTitle("Editor MultiPersona @Gutiérrez-Montenegro");
-		frm.setBounds(100, 100, 700, 600);
+		
+		frm.setBounds(700, 700, 700, 600);
 		frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frm.getContentPane().setLayout(null);
 		
@@ -257,6 +265,7 @@ public class PantallaEditora {
 		
 		
 		JButton btnOpen = new JButton("Abrir");
+		btnOpen.setEnabled(false);
 		btnOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Scanner sc;
@@ -299,6 +308,8 @@ public class PantallaEditora {
 		frm.getContentPane().add(scrollPane_1);
 		
 		list = new JList();
+		list.setVisible(false);
+		list.setEnabled(false);
 		scrollPane_1.setViewportView(list);
 		list.addMouseListener(new MouseAdapter() {
 			@Override
@@ -336,6 +347,7 @@ public class PantallaEditora {
 		JLabel lblUsuariosConectados = new JLabel("Usuarios conectados:");
 		lblUsuariosConectados.setBounds(413, 12, 160, 52);
 		frm.getContentPane().add(lblUsuariosConectados);
+		btnSave.setEnabled(false);
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (textArea.getLineCount()<=1) {
