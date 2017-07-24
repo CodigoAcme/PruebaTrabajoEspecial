@@ -25,6 +25,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JList;
 import javax.swing.JLabel;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class PantallaEditora {
 
@@ -61,7 +63,9 @@ public class PantallaEditora {
 		
 		frm.setTitle(titulo);
 		frm.setBounds(100, 100, 700, 600);
-		frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		//frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frm.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		
 		frm.getContentPane().setLayout(null);
 		
 		scrollPane = new JScrollPane();
@@ -214,10 +218,21 @@ public class PantallaEditora {
 	 */
 	private void initialize() {
 		frm = new JFrame();
+		frm.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				int rta=JOptionPane.showConfirmDialog(null, "¿Querés salir PEBETE?", "DANGER", JOptionPane.YES_NO_CANCEL_OPTION);
+				if (rta==JOptionPane.YES_OPTION) {
+					JOptionPane.showMessageDialog(null, "Saliendo..");
+					System.exit(1);
+				}
+			}
+		});
 	
 		frm.setTitle("Editor MultiPersona @Gutiérrez-Montenegro");
 		frm.setBounds(100, 100, 700, 600);
-		frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		//frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frm.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frm.getContentPane().setLayout(null);
 		
 		scrollPane = new JScrollPane();

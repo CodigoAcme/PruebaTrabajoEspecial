@@ -21,6 +21,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.JList;
@@ -65,7 +67,17 @@ public class PantallaEditora {
 		frm.setTitle(titulo);
 		usuario=in;
 		frm.setBounds(100, 100, 700, 600);
-		frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frm.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frm.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				int rta=JOptionPane.showConfirmDialog(null, "¿Querés salir PEBETE?", "DANGER", JOptionPane.YES_NO_CANCEL_OPTION);
+				if (rta==JOptionPane.YES_OPTION) {
+					//JOptionPane.showMessageDialog(null, "Saliendo..");
+					System.exit(1);
+				}
+			}
+		});
 		frm.getContentPane().setLayout(null);
 		
 		scrollPane = new JScrollPane();
@@ -148,16 +160,16 @@ public class PantallaEditora {
 			
 				//1 = NO
 				
-				int rta=JOptionPane.showConfirmDialog(null, "Invitar a "+(String) list.getSelectedValue()+"?");
+				int rta=JOptionPane.showConfirmDialog(null, "Invitar a "+(String) list.getSelectedValue()+"?","Invitación",JOptionPane.YES_NO_CANCEL_OPTION);
 				if (rta==JOptionPane.YES_OPTION) {
-					JOptionPane.showMessageDialog(null, "Invitacion Enviada");
+					JOptionPane.showMessageDialog(null, "Invitacion Enviada","Info",JOptionPane.INFORMATION_MESSAGE);
 					textField.setText("Cuando "+list.getSelectedValue()+ " se conecte, aca diría: "+list.getSelectedValue().toString()+" se conectó!");
 					PantallaEditora pantallaDeColaboracion=new PantallaEditora();
 					pantallaDeColaboracion.ponerEnTextArea(textArea.getText());
 					pantallaDeColaboracion.getFrm().setVisible(true);
 				}
 				if (rta==JOptionPane.CANCEL_OPTION) {
-					JOptionPane.showMessageDialog(null, "Invitacion cancelada");
+					JOptionPane.showMessageDialog(null, "Invitacion cancelada","Info",JOptionPane.INFORMATION_MESSAGE);
 				}
 				
 			}
