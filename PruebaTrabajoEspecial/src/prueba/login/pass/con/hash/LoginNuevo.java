@@ -11,6 +11,7 @@ import registros.Usuario;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import java.awt.event.ActionListener;
@@ -26,7 +27,7 @@ public class LoginNuevo extends JFrame {
 	private JTextField textField;
 	private JPasswordField passwordField;
 	private DBusuariosNuevo users;
-
+	private UsuarioNuevo usuarioIngresado;
 	/**
 	 * Launch the application.
 	 */
@@ -61,27 +62,32 @@ public class LoginNuevo extends JFrame {
 				
 				List<UsuarioNuevo> usuarios = users.getUsers();
 				boolean marca = false;
-				
+				UsuarioNuevo usuarioLoggeado = null;
 				if(!textField.getText().isEmpty() && !passwordField.getText().isEmpty()){
 					for (int i = 0; i < usuarios.size(); i++) {
 						if(textField.getText().equals(usuarios.get(i).getUser()) && 
 								passwordField.getText().hashCode()==(usuarios.get(i).getPass())){
 							marca = true;
+							usuarioLoggeado=usuarios.get(i);
+							usuarioLoggeado.setDirectorio("./usuarios_registrados/"+usuarioLoggeado.getUser());
 							break;
 						}
 					
 					}
 				}
 				if(marca){
-					PantallaEditora pantalla = new PantallaEditora();
+					
+					PantallaEditora pantalla = new PantallaEditora(textField.getText(),usuarioLoggeado);
+					JOptionPane.showMessageDialog(null, "Loggeo exitoso!","Informacion de Login",JOptionPane.INFORMATION_MESSAGE);
 					pantalla.getFrm().setVisible(true);
 					LoginNuevo.this.dispose();
 				}
 				else {
-					System.out.println("USUARIO NO ENCONTRADO");
-					ErrorDeSesion error = new ErrorDeSesion("USUARIO NO ENCONTRADO");
-					error.setLocationRelativeTo(null);
-					error.setVisible(true);
+					JOptionPane.showMessageDialog(null, "USUARIO NO ENCONTRADO!","Problema de login",JOptionPane.ERROR_MESSAGE);
+					//System.out.println("USUARIO NO ENCONTRADO");
+					//ErrorDeSesion error = new ErrorDeSesion("USUARIO NO ENCONTRADO");
+					//error.setLocationRelativeTo(null);
+					//error.setVisible(true);
 					textField.setText("");
 					passwordField.setText("");
 				}
@@ -148,8 +154,12 @@ public class LoginNuevo extends JFrame {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-						
-						PantallaEditora pantalla = new PantallaEditora();
+						String crear="./usuarios_registrados/"+textField.getText();
+						usuarioIngresado=new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode(), crear);
+						File carpeta=new File(crear);
+						carpeta.mkdirs();
+						JOptionPane.showMessageDialog(null, "REGISTRO EXITOSO!","Informacion de registro",JOptionPane.INFORMATION_MESSAGE);
+						PantallaEditora pantalla = new PantallaEditora(textField.getText(),usuarioIngresado);
 						pantalla.getFrm().setVisible(true);
 						LoginNuevo.this.dispose();
 						
