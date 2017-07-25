@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServidorExampleYoutube  {
 
@@ -68,13 +69,10 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 				
 				String nick, ip, mensaje;
 				PaqueteEnvio paqueteRecibido;
+				ArrayList<String> listaIp=new ArrayList<>();
 			while (true) {	
 				Socket miSocket=servidor.accept();//
-				/////DETECTA ONLINE/////////////
-				InetAddress localizacion=miSocket.getInetAddress();
-				//Tengo la direccion IP del socket que se conectó
-				String ipRemota=localizacion.getHostAddress();
-				System.out.println(ipRemota);
+				
 				ObjectInputStream paqueteDatos=new ObjectInputStream(miSocket.getInputStream());
 				
 				paqueteRecibido=(PaqueteEnvio) paqueteDatos.readObject();
@@ -82,28 +80,51 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 				ip=paqueteRecibido.getIp();
 				nick=paqueteRecibido.getNick();
 				mensaje=paqueteRecibido.getMensaje();
-				
-				areatexto.append(nick+": "+mensaje+" para "+ip+"\n");
+				if (!mensaje.equals(" online")) {//se conecto 1 cliente
+					
+					areatexto.append(nick+": "+mensaje+" para "+ip+"\n");
+					//Ahora, aca necesito crear un socet para mandar la info que recibí
+					//al cliente en cuestión
+					
+					Socket enviaDestinatario=new Socket(ip, 9090);
+					
+					//Como voy a mandar un objeto, necesito un ObjectOutputStream
+					
+					ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
+					
+					paqueteReEnvio.writeObject(paqueteRecibido);
+					paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
+					enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+					
+					miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
+				}else{//Si es la primera vez que se conecta
+				/////DETECTA ONLINE/////////////
+					InetAddress localizacion=miSocket.getInetAddress();
+					//Tengo la direccion IP del socket que se conectó
+					String ipRemota=localizacion.getHostAddress();
+					System.out.println("Online "+ipRemota);
+					listaIp.add(ipRemota);
+					paqueteRecibido.setIps(listaIp);//Mando la lista de conectados
+					for (String z : listaIp) {
+						System.out.println("Array:"+z);
+						Socket enviaDestinatario=new Socket(z, 9090);
+						
+						//Como voy a mandar un objeto, necesito un ObjectOutputStream
+						
+						ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
+						
+						paqueteReEnvio.writeObject(paqueteRecibido);
+						paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
+						enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+						
+						miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO1111111111
+					}
+				}
 				//DataInputStream flujoEntrada=new DataInputStream(miSocket.getInputStream());//Creo un flujo de entrada
 				
 				//String mensajeTexto=flujoEntrada.readUTF();
 				
 				//areatexto.append(mensajeTexto+"\n");
-				
-				//Ahora, aca necesito crear un socet para mandar la info que recibí
-				//al cliente en cuestión
-				
-				Socket enviaDestinatario=new Socket(ip, 9090);
-				
-				//Como voy a mandar un objeto, necesito un ObjectOutputStream
-				
-				ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
-				
-				paqueteReEnvio.writeObject(paqueteRecibido);
-				paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
-				enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
-				
-				miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
 			}
 			/*
 			 Recordar que todo este bloque esta dentro de un HILO EJECUTANDO EN

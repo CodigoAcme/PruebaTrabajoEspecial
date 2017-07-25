@@ -7,10 +7,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 
 import javax.swing.*;
 
 import java.net.*;
+import java.util.ArrayList;
 
 public class ClienteExampleYoutube {
 
@@ -36,9 +38,11 @@ class MarcoCliente extends JFrame{//ahora este cliente, debe estar a la escucha 
 		
 		add(milamina);
 		
+		addWindowListener(new EnvioOnline());
+		
 		setVisible(true);
 		
-		addWindowListener(new EnvioOnline());
+		
 		}	
 	
 }
@@ -57,10 +61,10 @@ class MarcoCliente extends JFrame{//ahora este cliente, debe estar a la escucha 
 			//Todo este bloque se ejecutará ni bien se abre la App
 			try {
 				Socket miSocket=new Socket("192.168.0.14", 9999);
-				
+				//JOptionPane.showMessageDialog(null, "Entro al WIndowOpened");
 				PaqueteEnvio datos=new PaqueteEnvio();
 				
-				datos.setMensaje("Online");
+				datos.setMensaje(" online");//de esta forma se que me conecte por 1era vez
 				
 				ObjectOutputStream paqueteDatos=new ObjectOutputStream(miSocket.getOutputStream());
 				
@@ -88,6 +92,14 @@ class MarcoCliente extends JFrame{//ahora este cliente, debe estar a la escucha 
 				
 				private String mensaje;
 				
+				private ArrayList<String> ips=new ArrayList<>();
+				
+				public ArrayList<String> getIps() {
+					return ips;
+				}
+				public void setIps(ArrayList<String> ips) {
+					this.ips = ips;
+				}
 				public String getIp() {
 					return ip;
 				}
@@ -129,10 +141,11 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 		
 		this.ip=new JComboBox();
 		
-		this.ip.addItem("Usuario 1");
-		this.ip.addItem("Usuario 2");
-		this.ip.addItem("Usuario 3");
+		/*
+		this.ip.addItem("192.168.0.14");
 		
+		this.ip.addItem("192.168.0.19");
+		*/
 		add(ip);
 		
 		this.campoChat=new JTextArea(12,20);
@@ -262,10 +275,27 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 				
 				paqueteRecibido=(PaqueteEnvio) flujoEntrada.readObject();
 				
-				campoChat.append(paqueteRecibido.getNick()+": "+paqueteRecibido.getMensaje()
-				+"\n");
+				if (!paqueteRecibido.getMensaje().equals(" online")) {
+					//Ya estamos chateando
+					campoChat.append(paqueteRecibido.getNick()+": "
+					+paqueteRecibido.getMensaje()+"\n");
+				} else {//Sino, es porque se contecto otro cliente
+					
+					//campoChat.append("\n"+paqueteRecibido.getIps());
+					ArrayList<String> ipsReceived=new ArrayList<>();
+					//Para que aparezcan los nicks de los conectados
+					//Uso un Mapa con clave:ip valor:nick
+					ipsReceived=paqueteRecibido.getIps();
+					ip.removeAllItems();
+					for (String ipsRecibidas : ipsReceived) {
+						ip.addItem(ipsRecibidas);
+					}
+					
+				}
 				
-				cliente.close();//EXTRA
+				
+				
+				
 			}
 			
 			
