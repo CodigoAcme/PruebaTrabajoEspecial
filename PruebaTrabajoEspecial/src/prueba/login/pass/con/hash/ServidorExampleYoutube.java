@@ -4,16 +4,16 @@ package prueba.login.pass.con.hash;
 
 import javax.swing.*;
 
-import prueba.login.pass.con.hash.LaminaMarcoCliente.PaqueteEnvio;
-
 import java.awt.*;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Servidor  {
+public class ServidorExampleYoutube  {
 
 	public static void main(String[] args) {
 		// El servidor tiene que hacer 2 tareas
@@ -70,7 +70,11 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 				PaqueteEnvio paqueteRecibido;
 			while (true) {	
 				Socket miSocket=servidor.accept();//
-				
+				/////DETECTA ONLINE/////////////
+				InetAddress localizacion=miSocket.getInetAddress();
+				//Tengo la direccion IP del socket que se conectó
+				String ipRemota=localizacion.getHostAddress();
+				System.out.println(ipRemota);
 				ObjectInputStream paqueteDatos=new ObjectInputStream(miSocket.getInputStream());
 				
 				paqueteRecibido=(PaqueteEnvio) paqueteDatos.readObject();
@@ -86,7 +90,19 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 				
 				//areatexto.append(mensajeTexto+"\n");
 				
-			
+				//Ahora, aca necesito crear un socet para mandar la info que recibí
+				//al cliente en cuestión
+				
+				Socket enviaDestinatario=new Socket(ip, 9090);
+				
+				//Como voy a mandar un objeto, necesito un ObjectOutputStream
+				
+				ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
+				
+				paqueteReEnvio.writeObject(paqueteRecibido);
+				paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
+				enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+				
 				miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
 			}
 			/*

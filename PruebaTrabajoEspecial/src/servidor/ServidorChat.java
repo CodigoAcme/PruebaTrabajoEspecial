@@ -15,9 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import ventanas.only.EscuchaCliente;
-import ventanas.only.Server;
-
 /**
  * Servidor de chat.
  * Acepta conexiones de clientes, crea un hilo para atenderlos, y espera la

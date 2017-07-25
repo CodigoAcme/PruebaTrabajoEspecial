@@ -48,14 +48,7 @@ public class Cliente extends JFrame implements Runnable {
 		
 		textArea = new JTextArea();
 		contentPane.add(textArea);
-		//ulti
-		textArea.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				textArea.append(System.lineSeparator()+System.lineSeparator());
-			}
-		});
-		//ulti
+
 	
 	    /**
 	     * Contruye una instancia de esta clase, lanzando un hilo para atender al
