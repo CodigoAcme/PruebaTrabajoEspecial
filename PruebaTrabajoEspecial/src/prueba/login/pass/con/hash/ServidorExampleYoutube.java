@@ -13,6 +13,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServidorExampleYoutube  {
 
@@ -67,9 +69,12 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 				ServerSocket servidor=new ServerSocket(9999);
 				//Sí es importante que acepte de nuevo las conexiones
 				
-				String nick, ip, mensaje;
+				String nick, nickRecibido, mensaje;
 				PaqueteEnvio paqueteRecibido;
 				ArrayList<String> listaIp=new ArrayList<>();
+				
+				String ipBusquedaDelMapa = null;
+				ArrayList<HashMap<String, String>> listaMapas=new ArrayList<>();
 			while (true) {	
 				Socket miSocket=servidor.accept();//
 				
@@ -77,33 +82,20 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 				
 				paqueteRecibido=(PaqueteEnvio) paqueteDatos.readObject();
 				//////////ATENCION AL PAQUETE/////////
-				ip=paqueteRecibido.getIp();
+				nickRecibido=paqueteRecibido.getIp();
+				System.out.println("El JComboBos tiene: "+nickRecibido);
 				nick=paqueteRecibido.getNick();
 				mensaje=paqueteRecibido.getMensaje();
-				if (!mensaje.equals(" online")) {//se conecto 1 cliente
-					
-					areatexto.append(nick+": "+mensaje+" para "+ip+"\n");
-					//Ahora, aca necesito crear un socet para mandar la info que recibí
-					//al cliente en cuestión
-					
-					Socket enviaDestinatario=new Socket(ip, 9090);
-					
-					//Como voy a mandar un objeto, necesito un ObjectOutputStream
-					
-					ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
-					
-					paqueteReEnvio.writeObject(paqueteRecibido);
-					paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
-					enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
-					
-					miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
-				}else{//Si es la primera vez que se conecta
-				/////DETECTA ONLINE/////////////
+				//listaMapas.addAll(paqueteRecibido.getListaMapasIpUsuario());
+				
+				//DESASTRE
+				if (mensaje.equals(" desconeccion")) {
+					areatexto.append("El cliente se desconecto"+"\n");
 					InetAddress localizacion=miSocket.getInetAddress();
 					//Tengo la direccion IP del socket que se conectó
 					String ipRemota=localizacion.getHostAddress();
-					System.out.println("Online "+ipRemota);
-					listaIp.add(ipRemota);
+					System.out.println("OFFLINE "+ipRemota);
+					listaIp.remove(ipRemota);
 					paqueteRecibido.setIps(listaIp);//Mando la lista de conectados
 					for (String z : listaIp) {
 						System.out.println("Array:"+z);
@@ -119,6 +111,78 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 						
 						miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO1111111111
 					}
+				}
+				//FIN DESASTRE
+				
+				if (!mensaje.equals(" online")) {//Ya estan chateando
+					for (HashMap<String, String> mapa : listaMapas) {
+						for(Map.Entry<String, String> entry: mapa.entrySet()){
+							if (entry.getValue().equals(nickRecibido)) {
+								ipBusquedaDelMapa=entry.getKey();
+							}
+						}
+					}
+					areatexto.append(nick+": "+mensaje+" para "+ipBusquedaDelMapa+"\n");
+					//Ahora, aca necesito crear un socet para mandar la info que recibí
+					//al cliente en cuestión
+					
+					Socket enviaDestinatario=new Socket(ipBusquedaDelMapa, 9090);
+					
+					//Como voy a mandar un objeto, necesito un ObjectOutputStream
+					
+					ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
+					
+					paqueteReEnvio.writeObject(paqueteRecibido);
+					paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
+					enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+					
+					miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
+				}else{//Si es la primera vez que se conecta
+				/////DETECTA ONLINE/////////////
+			
+					InetAddress localizacion=miSocket.getInetAddress();
+					//Tengo la direccion IP del socket que se conectó
+					String ipRemota=localizacion.getHostAddress();
+					HashMap<String, String> mapaAux=new HashMap<>();
+					mapaAux.put(ipRemota, nick);
+					System.out.println("nick: "+nick);
+					System.out.println("OnlineMapaNick "+mapaAux.get(ipRemota));
+					
+					System.out.println("Online "+ipRemota);
+					
+					listaIp.add(ipRemota);
+					paqueteRecibido.setIps(listaIp);//Mando la lista de conectados
+					
+					listaMapas.add(mapaAux);
+					paqueteRecibido.setListaMapasIpUsuario(listaMapas);
+					
+					for (HashMap<String, String> mapaDentroLista : listaMapas) {
+						for(Map.Entry<String, String> entry: mapaDentroLista.entrySet()){
+							Socket enviaDestinatarioDelMapa=new Socket(entry.getKey(), 9090);
+							ObjectOutputStream paqueteReEnvioDeMapa=new ObjectOutputStream(enviaDestinatarioDelMapa.getOutputStream());
+							paqueteReEnvioDeMapa.writeObject(paqueteRecibido);
+							paqueteReEnvioDeMapa.close();//CIERRO EL FLUJO DE DATOS
+							enviaDestinatarioDelMapa.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+							
+							miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
+						}
+					}
+					/*
+					for (String z : listaIp) {
+						System.out.println("Array:"+z);
+						Socket enviaDestinatario=new Socket(z, 9090);
+						
+						//Como voy a mandar un objeto, necesito un ObjectOutputStream
+						
+						ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
+						
+						paqueteReEnvio.writeObject(paqueteRecibido);
+						paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
+						enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+						
+						miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
+					}
+					*/
 				}
 				//DataInputStream flujoEntrada=new DataInputStream(miSocket.getInputStream());//Creo un flujo de entrada
 				

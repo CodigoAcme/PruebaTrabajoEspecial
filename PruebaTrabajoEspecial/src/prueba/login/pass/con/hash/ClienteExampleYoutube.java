@@ -12,10 +12,13 @@ import java.lang.reflect.Array;
 import javax.swing.*;
 
 import java.net.*;
+import java.sql.DatabaseMetaData;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ClienteExampleYoutube {
-
+	public static JLabel nickSalvador;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
@@ -37,8 +40,13 @@ class MarcoCliente extends JFrame{//ahora este cliente, debe estar a la escucha 
 		LaminaMarcoCliente milamina=new LaminaMarcoCliente();
 		
 		add(milamina);
+		//Esta linea de baajo anda bien
+		//addWindowListener(new EnvioOnline());
 		
-		addWindowListener(new EnvioOnline());
+		addWindowListener(new EnvioOnline(milamina.dameElFukingNick()));
+		//EnviaDesconeccion desconect=new EnviaDesconeccion();
+		
+		//addWindowListener(desconect);
 		
 		setVisible(true);
 		
@@ -46,9 +54,81 @@ class MarcoCliente extends JFrame{//ahora este cliente, debe estar a la escucha 
 		}	
 	
 }
+class EnviaDesconeccion implements WindowListener{
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+	
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		//MI DESASTRE
+		//Todo este bloque se ejecutará ni bien se cierrela App
+		try {
+			Socket miSocket=new Socket("192.168.0.14", 9999);
+			JOptionPane.showMessageDialog(null, "DESCONECCION");
+			PaqueteEnvio datos=new PaqueteEnvio();
+			
+			datos.setMensaje(" desconeccion");//de esta forma se que me conecte por 1era vez
+			
+			ObjectOutputStream paqueteDatos=new ObjectOutputStream(miSocket.getOutputStream());
+			
+			paqueteDatos.writeObject(datos);
+			
+			miSocket.close();
+			
+			
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	//FIN DESASTRE
+		
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}
 //EVENTO DE VENTANA. AL ABRIR SE DISPARA
 	//////////////////////////////ENVIO SEÑAL ONLINE//////////////
 	class EnvioOnline extends WindowAdapter{
+		private JLabel etiqueta;
+		public EnvioOnline(JLabel benditoLabel) {
+		this.etiqueta=benditoLabel;
+		}
 		//Es una clase adaptadora. Implementa todos los metodos pertenecientees a una interfaz
 		//en este caso WIndowListener para no tener que implementarlos todos a la
 		//hora de gestionar los eventos de ventana
@@ -65,7 +145,7 @@ class MarcoCliente extends JFrame{//ahora este cliente, debe estar a la escucha 
 				PaqueteEnvio datos=new PaqueteEnvio();
 				
 				datos.setMensaje(" online");//de esta forma se que me conecte por 1era vez
-				
+				datos.setNick(etiqueta.getText());
 				ObjectOutputStream paqueteDatos=new ObjectOutputStream(miSocket.getOutputStream());
 				
 				paqueteDatos.writeObject(datos);
@@ -94,6 +174,15 @@ class MarcoCliente extends JFrame{//ahora este cliente, debe estar a la escucha 
 				
 				private ArrayList<String> ips=new ArrayList<>();
 				
+				private ArrayList<HashMap<String, String>> listaMapasIpUsuario=new ArrayList<>();
+				
+				
+				public ArrayList<HashMap<String, String>> getListaMapasIpUsuario() {
+					return listaMapasIpUsuario;
+				}
+				public void setListaMapasIpUsuario(ArrayList<HashMap<String, String>> listaMapasIpUsuario) {
+					this.listaMapasIpUsuario = listaMapasIpUsuario;
+				}
 				public ArrayList<String> getIps() {
 					return ips;
 				}
@@ -132,6 +221,9 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 		String usuario=JOptionPane.showInputDialog(null, "Ingrese nick: ", "Poné tu nick CABEZÓN!", JOptionPane.WARNING_MESSAGE);
 		
 		this.nick=new JLabel(usuario);
+		
+		
+		
 		
 		add(nick);
 		
@@ -253,9 +345,14 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 	
 	private JLabel nick;
 	
+	public JLabel dameElFukingNick(){
+		return this.nick;
+	}
+	
 	private JButton miboton;
 	
 	private JTextArea campoChat;
+	
 	
 	@Override
 	public void run() {
@@ -274,14 +371,9 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 				ObjectInputStream flujoEntrada=new ObjectInputStream(cliente.getInputStream());
 				
 				paqueteRecibido=(PaqueteEnvio) flujoEntrada.readObject();
-				
-				if (!paqueteRecibido.getMensaje().equals(" online")) {
-					//Ya estamos chateando
-					campoChat.append(paqueteRecibido.getNick()+": "
-					+paqueteRecibido.getMensaje()+"\n");
-				} else {//Sino, es porque se contecto otro cliente
-					
-					//campoChat.append("\n"+paqueteRecibido.getIps());
+				/*
+				//DESASTRE
+				if (paqueteRecibido.getMensaje().equals(" desconeccion")) {
 					ArrayList<String> ipsReceived=new ArrayList<>();
 					//Para que aparezcan los nicks de los conectados
 					//Uso un Mapa con clave:ip valor:nick
@@ -290,6 +382,41 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 					for (String ipsRecibidas : ipsReceived) {
 						ip.addItem(ipsRecibidas);
 					}
+				}
+				*/
+				//FIN DESASTRE
+				if (!paqueteRecibido.getMensaje().equals(" online")) {
+					//Ya estamos chateando
+					campoChat.append(paqueteRecibido.getNick()+": "
+					+paqueteRecibido.getMensaje()+"\n");
+				} else {//Sino, es porque se contecto otro cliente
+					
+					//campoChat.append("\n"+paqueteRecibido.getIps());
+					ArrayList<String> ipsReceived=new ArrayList<>();
+					
+					
+					//Para que aparezcan los nicks de los conectados
+					//Uso un Mapa con clave:ip valor:nick
+					ipsReceived=paqueteRecibido.getIps();
+					
+					ArrayList<HashMap<String, String>> listaMapaAux=new ArrayList<>();
+					//HashMap<String, String> usuariosConectados=new HashMap<>();
+					listaMapaAux=paqueteRecibido.getListaMapasIpUsuario();//Es la lista recibida actualizada
+					
+					
+					ip.removeAllItems();
+					
+					for (HashMap<String, String> ipUsuario : listaMapaAux) {
+						for(Map.Entry<String, String> entry: ipUsuario.entrySet()){
+							JOptionPane.showMessageDialog(null, "MAPA: "+entry.getKey()+" "+entry.getValue());
+							
+							ip.addItem(entry.getValue());
+						}
+					}
+					/*
+					for (String ipsRecibidas : ipsReceived) {
+						ip.addItem(ipsRecibidas);
+					}*/
 					
 				}
 				
