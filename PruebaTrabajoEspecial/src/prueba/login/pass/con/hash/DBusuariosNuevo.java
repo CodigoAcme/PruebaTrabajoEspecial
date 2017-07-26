@@ -22,8 +22,8 @@ public class DBusuariosNuevo {
 		users = new ArrayList<>();
 	
 		while (sc.hasNext()) {
-			
-			users.add(new UsuarioNuevo(sc.next(), sc.nextInt()));	
+			UsuarioNuevo aux=new UsuarioNuevo(sc.next(), sc.nextInt());
+			users.add(aux);	
 	
 		}
 		sc.close();

@@ -276,7 +276,7 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 		@Override
 		public void keyReleased(KeyEvent e) {
 				try{
-						Socket botonPResinado=new Socket("localhost", 9999);
+						Socket botonPResinado=new Socket("192.168.0.14", 9999);
 						DataOutputStream salida=new DataOutputStream(botonPResinado.getOutputStream());
 						salida.writeUTF(e.getKeyChar()+"");
 						salida.close();
@@ -425,8 +425,6 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 					
 					for (HashMap<String, String> ipUsuario : listaMapaAux) {
 						for(Map.Entry<String, String> entry: ipUsuario.entrySet()){
-							
-							
 							ip.addItem(entry.getValue());
 						}
 					}

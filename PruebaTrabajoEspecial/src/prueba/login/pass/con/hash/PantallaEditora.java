@@ -11,7 +11,16 @@ import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.awt.event.ActionEvent;
 
@@ -28,7 +37,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JList;
 import javax.swing.JLabel;
 
-public class PantallaEditora {
+public class PantallaEditora implements Runnable{
 
 	private JFrame frm;
 	private JTextField textField;
@@ -71,7 +80,7 @@ public class PantallaEditora {
 		frm.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				int rta=JOptionPane.showConfirmDialog(null, "¿Querés salir PEBETE?", "DANGER", JOptionPane.YES_NO_CANCEL_OPTION);
+				int rta=JOptionPane.showConfirmDialog(null, "¿Querés salir "+getFrm().getTitle()+" ?", "DANGER", JOptionPane.YES_NO_CANCEL_OPTION);
 				if (rta==JOptionPane.YES_OPTION) {
 					//JOptionPane.showMessageDialog(null, "Saliendo..");
 					System.exit(1);
@@ -176,6 +185,7 @@ public class PantallaEditora {
 		});
 		
 		DefaultListModel modelo = new DefaultListModel();
+		/*
 		modelo.addElement("Cris");
 		modelo.addElement("Ruben");
 		modelo.addElement("Fer");
@@ -185,6 +195,7 @@ public class PantallaEditora {
 		modelo.addElement("Gimenez");
 		modelo.addElement("Perla");
 		modelo.addElement("Ceci");
+		*/
 		list.setModel(modelo);
 		
 		JLabel lblUsuariosConectados = new JLabel("Usuarios conectados:");
@@ -237,6 +248,35 @@ public class PantallaEditora {
 				}
 			}
 		});
+		
+		frm.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				try {
+					Socket miSocket=new Socket("100.75.54.45", 9999);
+					//JOptionPane.showMessageDialog(null, "Entro al WIndowOpened");
+					PaqueteEnvio datos=new PaqueteEnvio();
+					
+					datos.setMensaje("loginOK");//de esta forma se que me conecte por 1era vez
+					datos.setNick(getFrm().getTitle());
+					ObjectOutputStream paqueteDatos=new ObjectOutputStream(miSocket.getOutputStream());
+					
+					paqueteDatos.writeObject(datos);
+					
+					miSocket.close();
+					
+					
+				} catch (UnknownHostException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		Thread miHilo=new Thread(this);
+		miHilo.start();
 	}
 
 	public JFrame getFrm(){
@@ -252,7 +292,7 @@ public class PantallaEditora {
 	//NO
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	private void initialize() {
-		frm = new JFrame();
+	
 	
 		
 		frm.setBounds(700, 700, 700, 600);
@@ -345,6 +385,7 @@ public class PantallaEditora {
 		});
 		
 		DefaultListModel modelo = new DefaultListModel();
+		
 		modelo.addElement("Cris");
 		modelo.addElement("Ruben");
 		modelo.addElement("Fer");
@@ -354,6 +395,7 @@ public class PantallaEditora {
 		modelo.addElement("Gimenez");
 		modelo.addElement("Perla");
 		modelo.addElement("Ceci");
+		
 		list.setModel(modelo);
 		
 		JLabel lblUsuariosConectados = new JLabel("Usuarios conectados:");
@@ -401,5 +443,12 @@ public class PantallaEditora {
 				}
 			}
 		});
+	}
+
+@Override
+public void run() {
+	
+	
+		
 	}
 }

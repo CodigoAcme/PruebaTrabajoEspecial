@@ -15,9 +15,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.List;
 import java.awt.event.ActionEvent;
 
@@ -57,39 +61,41 @@ public class LoginNuevo extends JFrame {
 		contentPane.setLayout(null);
 		
 		JButton btnNewButton = new JButton("INICIAR SESION");
+		DBusuariosNuevo users=new DBusuariosNuevo();
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				List<UsuarioNuevo> usuarios = users.getUsers();
-				boolean marca = false;
-				UsuarioNuevo usuarioLoggeado = null;
-				if(!textField.getText().isEmpty() && !passwordField.getText().isEmpty()){
-					for (int i = 0; i < usuarios.size(); i++) {
-						if(textField.getText().equals(usuarios.get(i).getUser()) && 
-								passwordField.getText().hashCode()==(usuarios.get(i).getPass())){
-							marca = true;
-							usuarioLoggeado=usuarios.get(i);
-							usuarioLoggeado.setDirectorio("./usuarios_registrados/"+usuarioLoggeado.getUser());
-							break;
+				try {
+					
+					if (!textField.getText().isEmpty()&&!passwordField.getText().isEmpty()) {
+						
+						Socket enviaServidor=new Socket("localhost", 9999);
+						UsuarioNuevo paqueteEnvio=new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode(),UsuarioNuevo.LOGGEO);
+						ObjectOutputStream flujoSalida=new ObjectOutputStream(enviaServidor.getOutputStream());
+						
+						flujoSalida.writeObject(paqueteEnvio);
+						
+						DataInputStream mensajeServidor=new DataInputStream(enviaServidor.getInputStream());
+						String respuesta=mensajeServidor.readUTF();
+						JOptionPane.showMessageDialog(null, respuesta);
+					
+						enviaServidor.close();
+						
+						if (respuesta.equals("Loggeo OK!")) {
+							PantallaEditora pantalla=new PantallaEditora(textField.getText(), new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode()));
+							LoginNuevo.this.dispose();
+							pantalla.getFrm().setVisible(true);
 						}
-					
+						
 					}
-				}
-				if(marca){
+					else{
+						JOptionPane.showMessageDialog(null, "Los campos no pueden estar vacios!");
+					}
 					
-					PantallaEditora pantalla = new PantallaEditora(textField.getText(),usuarioLoggeado);
-					JOptionPane.showMessageDialog(null, "Loggeo exitoso!","Informacion de Login",JOptionPane.INFORMATION_MESSAGE);
-					pantalla.getFrm().setVisible(true);
-					LoginNuevo.this.dispose();
-				}
-				else {
-					JOptionPane.showMessageDialog(null, "USUARIO NO ENCONTRADO!","Problema de login",JOptionPane.ERROR_MESSAGE);
-					//System.out.println("USUARIO NO ENCONTRADO");
-					//ErrorDeSesion error = new ErrorDeSesion("USUARIO NO ENCONTRADO");
-					//error.setLocationRelativeTo(null);
-					//error.setVisible(true);
-					textField.setText("");
-					passwordField.setText("");
+					
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 				
 			}
@@ -101,70 +107,34 @@ public class LoginNuevo extends JFrame {
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				List<UsuarioNuevo> usuarios = users.getUsers();
-				boolean marca = false;
-				
-				if(!textField.getText().isEmpty() && !passwordField.getText().isEmpty()){
-					for (int i = 0; i < usuarios.size(); i++) {
-						if(textField.getText().equals(usuarios.get(i).getUser())){
-							marca = true;
-							break;
-						}
+				try {
 					
-					}
-				}
-					else {
-						if(textField.getText().isEmpty()){
-							System.out.println("INGRESE USUARIO");
-							ErrorDeSesion error = new ErrorDeSesion("INGRESE USUARIO");
-							error.setLocationRelativeTo(null);
-							error.setVisible(true);
-							textField.setText("");
-							passwordField.setText("");
-						}
-						else {
-							System.out.println("INGRESE CONTRASE�A");
-							ErrorDeSesion error = new ErrorDeSesion("INGRESE CONTRASE�A");
-							error.setLocationRelativeTo(null);
-							error.setVisible(true);
-							textField.setText("");
-							passwordField.setText("");
-						}
-					}
-				
-				if(marca){
-					System.out.println("USUARIO NO DISPONIBLE");
-					ErrorDeSesion error = new ErrorDeSesion("USUARIO NO DISPONIBLE");
-					error.setLocationRelativeTo(null);
-					error.setVisible(true);
-					textField.setText("");
-					passwordField.setText("");
-				}
-				else{
-					if(!textField.getText().isEmpty() && !passwordField.getText().isEmpty()){
-						usuarios.add(new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode()));
-						try {
-							PrintWriter pw = new PrintWriter(new File(users.getPathIn()));
-							for (int i = 0; i < usuarios.size(); i++) {
-								pw.println(usuarios.get(i).getUser()+" "+usuarios.get(i).getPass());
-							}
-							pw.close();
-							
-						} catch (FileNotFoundException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						String crear="./usuarios_registrados/"+textField.getText();
-						usuarioIngresado=new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode(), crear);
-						File carpeta=new File(crear);
-						carpeta.mkdirs();
-						JOptionPane.showMessageDialog(null, "REGISTRO EXITOSO!","Informacion de registro",JOptionPane.INFORMATION_MESSAGE);
-						PantallaEditora pantalla = new PantallaEditora(textField.getText(),usuarioIngresado);
-						pantalla.getFrm().setVisible(true);
-						LoginNuevo.this.dispose();
+					if (!textField.getText().isEmpty()&&!passwordField.getText().isEmpty()) {
+						
+						Socket enviaServidor=new Socket("localhost", 9999);
+						UsuarioNuevo paqueteEnvio=new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode(),UsuarioNuevo.REGISTRAR);
+						ObjectOutputStream flujoSalida=new ObjectOutputStream(enviaServidor.getOutputStream());
+						
+						flujoSalida.writeObject(paqueteEnvio);
+						
+						DataInputStream mensajeServidor=new DataInputStream(enviaServidor.getInputStream());
+						JOptionPane.showMessageDialog(null, mensajeServidor.readUTF());
+					
+						enviaServidor.close();
 						
 					}
+					else{
+						JOptionPane.showMessageDialog(null, "Los campos no pueden estar vacios!");
+					}
+					
+					
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
+				
+				
+				
 			}
 		});
 		btnNewButton_1.setBounds(256, 228, 126, 23);
