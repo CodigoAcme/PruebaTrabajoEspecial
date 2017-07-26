@@ -44,9 +44,9 @@ class MarcoCliente extends JFrame{//ahora este cliente, debe estar a la escucha 
 		//addWindowListener(new EnvioOnline());
 		
 		addWindowListener(new EnvioOnline(milamina.dameElFukingNick()));
-		//EnviaDesconeccion desconect=new EnviaDesconeccion();
+		EnviaDesconeccion desconect=new EnviaDesconeccion();
 		
-		//addWindowListener(desconect);
+		addWindowListener(desconect);
 		
 		setVisible(true);
 		
@@ -74,7 +74,7 @@ class EnviaDesconeccion implements WindowListener{
 		//Todo este bloque se ejecutará ni bien se cierrela App
 		try {
 			Socket miSocket=new Socket("192.168.0.14", 9999);
-			JOptionPane.showMessageDialog(null, "DESCONECCION");
+			JOptionPane.showMessageDialog(null, "DESCONECTANDO..");
 			PaqueteEnvio datos=new PaqueteEnvio();
 			
 			datos.setMensaje(" desconeccion");//de esta forma se que me conecte por 1era vez
@@ -385,6 +385,23 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 				}
 				*/
 				//FIN DESASTRE
+				if (paqueteRecibido.getMensaje().equals(" desconeccion")) {
+					ArrayList<String> ipsReceived=new ArrayList<>();
+					//Para que aparezcan los nicks de los conectados
+					//Uso un Mapa con clave:ip valor:nick
+					ipsReceived=paqueteRecibido.getIps();
+					///TODO LO DE ARRIBA NO ES NECESARIO
+					ArrayList<HashMap<String, String>> listaMapaActualizadaAux=new ArrayList<>();
+					
+					listaMapaActualizadaAux=paqueteRecibido.getListaMapasIpUsuario();
+					ip.removeAllItems();
+					for (HashMap<String, String> mapa : listaMapaActualizadaAux) {
+						for(Map.Entry<String, String> entry: mapa.entrySet()){
+							ip.addItem(entry.getValue());
+						}
+					}
+				}
+				
 				if (!paqueteRecibido.getMensaje().equals(" online")) {
 					//Ya estamos chateando
 					campoChat.append(paqueteRecibido.getNick()+": "
@@ -408,7 +425,7 @@ class LaminaMarcoCliente extends JPanel implements Runnable{//La clase que tiene
 					
 					for (HashMap<String, String> ipUsuario : listaMapaAux) {
 						for(Map.Entry<String, String> entry: ipUsuario.entrySet()){
-							JOptionPane.showMessageDialog(null, "MAPA: "+entry.getKey()+" "+entry.getValue());
+							
 							
 							ip.addItem(entry.getValue());
 						}

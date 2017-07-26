@@ -95,10 +95,45 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 					//Tengo la direccion IP del socket que se conectó
 					String ipRemota=localizacion.getHostAddress();
 					System.out.println("OFFLINE "+ipRemota);
+					
 					listaIp.remove(ipRemota);
+					
+					int indiceDeListaAeliminar = 0;
+					int contador=0;
+					for (HashMap<String, String> mapa : listaMapas) {
+						for(Map.Entry<String, String> entry: mapa.entrySet()){
+							if (entry.getKey().equals(ipRemota)) {
+								indiceDeListaAeliminar=contador;
+							}
+						}
+						contador++;
+					}
+					
+					listaMapas.remove(indiceDeListaAeliminar);
+					
+					
 					paqueteRecibido.setIps(listaIp);//Mando la lista de conectados
+					paqueteRecibido.setListaMapasIpUsuario(listaMapas);
+					
+					for (HashMap<String, String> mapa : listaMapas) {
+						for(Map.Entry<String, String> entry: mapa.entrySet()){
+							Socket enviaDestinatario=new Socket(entry.getKey(), 9090);
+							
+							//Como voy a mandar un objeto, necesito un ObjectOutputStream
+							
+							ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
+							
+							paqueteReEnvio.writeObject(paqueteRecibido);
+							paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
+							enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+							
+							miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
+						}
+						
+					}
+					//OJO QUE ESTO DE ABAJO NO DEBERIA IR
 					for (String z : listaIp) {
-						System.out.println("Array:"+z);
+						//System.out.println("Array:"+z);
 						Socket enviaDestinatario=new Socket(z, 9090);
 						
 						//Como voy a mandar un objeto, necesito un ObjectOutputStream
@@ -109,7 +144,7 @@ class MarcoServidor extends JFrame implements Runnable{ //clase que contruye el 
 						paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
 						enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
 						
-						miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO1111111111
+						miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
 					}
 				}
 				//FIN DESASTRE
