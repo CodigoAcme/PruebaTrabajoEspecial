@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Server  {
-
+	
 	public static void main(String[] args) {
 		// El servidor tiene que hacer 2 tareas
 		//1 recibe en textArea texto
@@ -41,7 +41,7 @@ public class Server  {
 class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 	
 	public Marco(){
-		
+		setTitle("Soy yo!");
 		setBounds(1200,300,280,350);				
 			
 		JPanel milamina= new JPanel();
@@ -84,14 +84,14 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 				
 		
 				DBusuariosNuevo users=new DBusuariosNuevo();
-				
+				UsuarioNuevo aux;
 			while (true) {	
 				Socket miSocket;
 				try {
 					miSocket = servidor.accept();
 					ObjectInputStream paqueteDatos=new ObjectInputStream(miSocket.getInputStream());
 					
-					UsuarioNuevo aux=(UsuarioNuevo) paqueteDatos.readObject();
+					aux=(UsuarioNuevo) paqueteDatos.readObject();
 					
 					int opcion=aux.getClave();
 					
@@ -183,9 +183,21 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 							}
 						
 						if(marca){
-							
-							DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
-							flujoSalida.writeUTF("Loggeo OK!");
+							File archivosDelUsuario= new File("./usuarios_registrados/"+usuarioLoggeado.getUser());
+							File[] listOfFiles = archivosDelUsuario.listFiles();
+							ArrayList<File> listaArchivos=new ArrayList<>();
+							    for (int i = 0; i < listOfFiles.length; i++) {
+							      if (listOfFiles[i].isFile()) {
+							    	  listaArchivos.add(listOfFiles[i]);
+							      }
+							    }
+							ObjectOutputStream salida=new ObjectOutputStream(miSocket.getOutputStream());
+							UsuarioNuevo usuarioConMensajeYsusArchivos=new UsuarioNuevo();
+							usuarioConMensajeYsusArchivos.setListaArchivos(listaArchivos);
+							usuarioConMensajeYsusArchivos.setMensaje("Loggeo OK!");
+							salida.writeObject(usuarioConMensajeYsusArchivos);
+							//DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
+							//flujoSalida.writeUTF("Loggeo OK!");
 							miSocket.close();
 								
 						}

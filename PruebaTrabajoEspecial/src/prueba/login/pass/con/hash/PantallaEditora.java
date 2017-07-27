@@ -43,7 +43,9 @@ public class PantallaEditora implements Runnable{
 	private JTextField textField;
 	private JTextArea textArea;
 	private JScrollPane scrollPane;
+	private JScrollPane scrollPane_2;
 	private JList list;
+	private JList list_1;
 	private JScrollPane scrollPane_1;
 	private UsuarioNuevo usuario;
 	private String archivoSeleccionado;
@@ -115,42 +117,7 @@ public class PantallaEditora implements Runnable{
 		
 		//fc=new JFileChooser();
 		//fc.setCurrentDirectory(new java.io.File(usuario.getDirectorio()));
-		JButton btnOpen = new JButton("Abrir");
-		btnOpen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Scanner sc;
-				try {
-					JFileChooser fc=new JFileChooser();
-					
-					//String path="/home/ruben/usuarios_registrados/"+frm.getTitle();
-					String path=usuario.getDirectorio();
-					fc.setCurrentDirectory(new java.io.File(path));
-					fc.setDialogTitle("Elige tu archivo a abrir");
-					fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-					if (fc.showOpenDialog(fc)==JFileChooser.APPROVE_OPTION) {
-						sc = new Scanner(new File(fc.getSelectedFile().getAbsolutePath()));
-						textArea.setText("");
-						while (sc.hasNextLine()) {
-							textArea.append(sc.nextLine()+"\n");
-					}
-					textField.setText("");
-					File f=new File(fc.getSelectedFile().getPath());
-					archivoSeleccionado=f.getName();
-					textField.setText("Se abrió el archivo: "+f.getName());
-					
-					sc.close();
-					}else{
-						textField.setText("No seleccionó ningún archivo para abrir!");
-					}
-				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		btnOpen.setIcon(new ImageIcon(PantallaEditora.class.getResource("/images/folder.png")));
-		btnOpen.setBounds(44, 12, 141, 52);
-		frm.getContentPane().add(btnOpen);
+		
 		
 		JButton btnSave = new JButton("Guardar");
 		btnSave.setIcon(new ImageIcon(PantallaEditora.class.getResource("/images/save.jpg")));
@@ -185,6 +152,11 @@ public class PantallaEditora implements Runnable{
 		});
 		
 		DefaultListModel modelo = new DefaultListModel();
+		ArrayList<File> listaArchivosAux=new ArrayList<>();
+		listaArchivosAux=usuario.getListaArchivos();
+		for (File file : listaArchivosAux) {
+			modelo.addElement(file.getName());
+		}
 		/*
 		modelo.addElement("Cris");
 		modelo.addElement("Ruben");
@@ -196,83 +168,34 @@ public class PantallaEditora implements Runnable{
 		modelo.addElement("Perla");
 		modelo.addElement("Ceci");
 		*/
-		list.setModel(modelo);
+		
+		
+		scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(416, 329, 157, 144);
+		frm.getContentPane().add(scrollPane_2);
+		
+		list_1 = new JList();
+		scrollPane_2.setViewportView(list_1);
+		list_1.setModel(modelo);
 		
 		JLabel lblUsuariosConectados = new JLabel("Usuarios conectados:");
 		lblUsuariosConectados.setBounds(413, 12, 160, 52);
 		frm.getContentPane().add(lblUsuariosConectados);
 		
-		
+		JLabel lblMisArchivos = new JLabel("Mis archivos");
+		lblMisArchivos.setBounds(413, 285, 160, 52);
+		frm.getContentPane().add(lblMisArchivos);
 		
 		btnSave.setEnabled(true);
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//if (textArea.getLineCount()<=1) {
-				if (textArea.getText().isEmpty()) {
-					int dialogResult =JOptionPane.showConfirmDialog(null, "¿Querés guardar un nuevo archivo?", "ADVERTENCIA", JOptionPane.YES_NO_CANCEL_OPTION);
-					if (dialogResult==JOptionPane.YES_OPTION) {
-						JFileChooser saveFile = new JFileChooser();
-						String pathS=usuario.getDirectorio();
-						saveFile.setCurrentDirectory(new java.io.File(pathS));
-						saveFile.setDialogTitle("Ingresa el nombre de tu archivo");
-						
-	                    int saveOption = saveFile.showSaveDialog(frm);
-	                    if(saveOption == JFileChooser.APPROVE_OPTION){
-
-	                        try{
-	                           PrintWriter pw = new PrintWriter(new File(saveFile.getSelectedFile().getPath()));
-	                           pw.write(textArea.getText());
-	                           pw.close();
-	                           textField.setText("Se guardo el archivo!");
-	                        }catch(Exception ex){
-
-	                        }
-	                    }
-					}
-				} else {//GUARDAR SOLAMENTE
-					//JFileChooser saveFile = new JFileChooser();
-                    //int saveOption = saveFile.showSaveDialog(frm);
-                    //if(saveOption == JFileChooser.APPROVE_OPTION){
-						PrintWriter pw = null;
-						try {
-							pw = new PrintWriter(new File(usuario.getDirectorio()+"/"+archivoSeleccionado));
-							pw.print(textArea.getText());
-						} catch (FileNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}finally {
-							pw.close();
-							textField.setText("Se guardo el archivo!");
-						}
-                    //}
 				}
-			}
 		});
 		
 		frm.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
-				try {
-					Socket miSocket=new Socket("100.75.54.45", 9999);
-					//JOptionPane.showMessageDialog(null, "Entro al WIndowOpened");
-					PaqueteEnvio datos=new PaqueteEnvio();
-					
-					datos.setMensaje("loginOK");//de esta forma se que me conecte por 1era vez
-					datos.setNick(getFrm().getTitle());
-					ObjectOutputStream paqueteDatos=new ObjectOutputStream(miSocket.getOutputStream());
-					
-					paqueteDatos.writeObject(datos);
-					
-					miSocket.close();
-					
-					
-				} catch (UnknownHostException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				
 			}
 		});
 		Thread miHilo=new Thread(this);
@@ -294,7 +217,7 @@ public class PantallaEditora implements Runnable{
 	private void initialize() {
 	
 	
-		
+		frm = new JFrame();
 		frm.setBounds(700, 700, 700, 600);
 		frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frm.getContentPane().setLayout(null);
@@ -307,48 +230,13 @@ public class PantallaEditora implements Runnable{
 		textArea = new JTextArea();
 		
 	
-		scrollPane.setViewportView(textArea);
+		scrollPane.setRowHeaderView(textArea);
 		
 		textField = new JTextField();
 		textField.setEditable(false);
 		textField.setBounds(44, 515, 529, 19);
 		frm.getContentPane().add(textField);
 		textField.setColumns(10);
-		
-		
-		JButton btnOpen = new JButton("Abrir");
-		btnOpen.setEnabled(false);
-		btnOpen.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Scanner sc;
-				try {
-					JFileChooser fc=new JFileChooser();
-					fc.setCurrentDirectory(new java.io.File(""));
-					fc.setDialogTitle("Elige tu archivo a abrir");
-					fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-					if (fc.showOpenDialog(fc)==JFileChooser.APPROVE_OPTION) {
-						sc = new Scanner(new File(fc.getSelectedFile().getAbsolutePath()));
-						
-						while (sc.hasNextLine()) {
-							textArea.append(sc.nextLine()+"\n");
-					}
-					textField.setText("");
-					File f=new File(fc.getSelectedFile().getPath());
-					textField.setText("Se abrió el archivo: "+f.getName());
-					
-					sc.close();
-					}else{
-						textField.setText("No seleccionó ningún archivo para abrir!");
-					}
-				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		btnOpen.setIcon(new ImageIcon(PantallaEditora.class.getResource("/images/folder.png")));
-		btnOpen.setBounds(44, 12, 141, 52);
-		frm.getContentPane().add(btnOpen);
 		
 		JButton btnSave = new JButton("Guardar");
 		btnSave.setIcon(new ImageIcon(PantallaEditora.class.getResource("/images/save.jpg")));
@@ -398,49 +286,16 @@ public class PantallaEditora implements Runnable{
 		
 		list.setModel(modelo);
 		
+		
 		JLabel lblUsuariosConectados = new JLabel("Usuarios conectados:");
 		lblUsuariosConectados.setBounds(413, 12, 160, 52);
 		frm.getContentPane().add(lblUsuariosConectados);
 		btnSave.setEnabled(false);
+		
+		
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (textArea.getLineCount()<=1) {
-					
-					int dialogResult =JOptionPane.showConfirmDialog(null, "¿Querés guardar un nuevo archivo?", "ADVERTENCIA", JOptionPane.YES_NO_CANCEL_OPTION);
-					if (dialogResult==JOptionPane.YES_OPTION) {
-						JFileChooser saveFile = new JFileChooser();
-	                    int saveOption = saveFile.showSaveDialog(frm);
-	                    if(saveOption == JFileChooser.APPROVE_OPTION){
-
-	                        try{
-	                           PrintWriter pw = new PrintWriter(new File(saveFile.getSelectedFile().getPath()));
-	                           pw.write(textArea.getText());
-	                           pw.close();
-	                        }catch(Exception ex){
-
-	                        }
-	                    }
-					}
-				} else {
-					JFileChooser saveFile = new JFileChooser();
-                    int saveOption = saveFile.showSaveDialog(frm);
-                    if(saveOption == JFileChooser.APPROVE_OPTION){
-						PrintWriter pw = null;
-						try {
-							pw = new PrintWriter(new File(saveFile.getSelectedFile().getAbsolutePath()));
-							pw.print(textArea.getText());
-						} catch (FileNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}finally {
-							
-							pw.close();
-							File f2=new File(saveFile.getSelectedFile().getAbsolutePath());
-							textField.setText("Se guardo el archivo: "+f2.getName());
-							
-						}
-                    }
-				}
+			JOptionPane.showMessageDialog(null, "guardaría");
 			}
 		});
 	}

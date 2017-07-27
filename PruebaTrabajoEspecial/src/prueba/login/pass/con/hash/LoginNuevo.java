@@ -19,14 +19,17 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
+import java.util.Scanner;
 import java.awt.event.ActionEvent;
 
 public class LoginNuevo extends JFrame {
-
+	public static String pathIP="ip.in";
+	public static String ipServer;
 	private JPanel contentPane;
 	private JTextField textField;
 	private JPasswordField passwordField;
@@ -52,6 +55,24 @@ public class LoginNuevo extends JFrame {
 	 * Create the frame.
 	 */
 	public LoginNuevo() {
+		Scanner sc = null;
+		try {
+			sc = new Scanner(new File(pathIP));
+			ipServer=sc.next();
+		} catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		finally {
+			sc.close();
+		}
+		
+		
+		if (ipServer.isEmpty()||ipServer.equals(null)) {
+			JOptionPane.showMessageDialog(null, "Ingresar la IP del servidor en el archivo "+pathIP);
+			System.exit(ABORT);
+		}
+		
 		setTitle("LOGIN");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 300);
@@ -69,20 +90,24 @@ public class LoginNuevo extends JFrame {
 					
 					if (!textField.getText().isEmpty()&&!passwordField.getText().isEmpty()) {
 						
-						Socket enviaServidor=new Socket("localhost", 9999);
+						
+						
+						Socket enviaServidor=new Socket(ipServer, 9999);
 						UsuarioNuevo paqueteEnvio=new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode(),UsuarioNuevo.LOGGEO);
 						ObjectOutputStream flujoSalida=new ObjectOutputStream(enviaServidor.getOutputStream());
 						
 						flujoSalida.writeObject(paqueteEnvio);
 						
-						DataInputStream mensajeServidor=new DataInputStream(enviaServidor.getInputStream());
-						String respuesta=mensajeServidor.readUTF();
-						JOptionPane.showMessageDialog(null, respuesta);
+						//DataInputStream mensajeServidor=new DataInputStream(enviaServidor.getInputStream());
+						ObjectInputStream mensajeServidor=new ObjectInputStream(enviaServidor.getInputStream());
+						UsuarioNuevo respuesta=(UsuarioNuevo) mensajeServidor.readObject();
+						//String respuesta=mensajeServidor.readUTF();
+						JOptionPane.showMessageDialog(null, respuesta.getMensaje());
 					
 						enviaServidor.close();
 						
-						if (respuesta.equals("Loggeo OK!")) {
-							PantallaEditora pantalla=new PantallaEditora(textField.getText(), new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode()));
+						if (respuesta.getMensaje().equals("Loggeo OK!")) {
+							PantallaEditora pantalla=new PantallaEditora(textField.getText(), new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode(),respuesta.getListaArchivos()));
 							LoginNuevo.this.dispose();
 							pantalla.getFrm().setVisible(true);
 						}
@@ -93,7 +118,7 @@ public class LoginNuevo extends JFrame {
 					}
 					
 					
-				} catch (IOException e1) {
+				} catch (IOException | ClassNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -111,7 +136,7 @@ public class LoginNuevo extends JFrame {
 					
 					if (!textField.getText().isEmpty()&&!passwordField.getText().isEmpty()) {
 						
-						Socket enviaServidor=new Socket("localhost", 9999);
+						Socket enviaServidor=new Socket(ipServer, 9999);
 						UsuarioNuevo paqueteEnvio=new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode(),UsuarioNuevo.REGISTRAR);
 						ObjectOutputStream flujoSalida=new ObjectOutputStream(enviaServidor.getOutputStream());
 						
@@ -121,6 +146,8 @@ public class LoginNuevo extends JFrame {
 						JOptionPane.showMessageDialog(null, mensajeServidor.readUTF());
 					
 						enviaServidor.close();
+						
+						new File("./usuarios_registrados/"+textField.getText()).mkdirs();
 						
 					}
 					else{

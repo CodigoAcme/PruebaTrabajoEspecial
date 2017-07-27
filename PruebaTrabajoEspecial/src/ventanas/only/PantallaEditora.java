@@ -36,6 +36,8 @@ public class PantallaEditora {
 	private JScrollPane scrollPane;
 	private JList list;
 	private JScrollPane scrollPane_1;
+	private JList list_1;
+	private JScrollPane scrollPane_2;
 	/**
 	 * Launch the application.
 	 */
@@ -165,6 +167,8 @@ public class PantallaEditora {
 		modelo.addElement("Perla");
 		modelo.addElement("Ceci");
 		list.setModel(modelo);
+		
+		
 		
 		JLabel lblUsuariosConectados = new JLabel("Usuarios conectados:");
 		lblUsuariosConectados.setBounds(413, 12, 160, 52);
@@ -332,10 +336,22 @@ public class PantallaEditora {
 		modelo.addElement("Perla");
 		modelo.addElement("Ceci");
 		list.setModel(modelo);
+
+		
+		
 		
 		JLabel lblUsuariosConectados = new JLabel("Usuarios conectados:");
 		lblUsuariosConectados.setBounds(413, 12, 160, 52);
 		frm.getContentPane().add(lblUsuariosConectados);
+		
+		scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(416, 329, 157, 144);
+		frm.getContentPane().add(scrollPane_2);
+		
+		list_1 = new JList();
+		scrollPane_2.setViewportView(list_1);
+		list_1.setModel(modelo);
+		
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (textArea.getLineCount()<=1) {
