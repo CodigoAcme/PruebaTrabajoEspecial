@@ -7,12 +7,13 @@ import java.util.ArrayList;
 public class UsuarioNuevo implements Serializable{
 	private String user;
 	private int pass;
-	private String directorio;//relativo donde guardará sus archivos
+	private String nombreArchivoAabrir;//relativo donde guardará sus archivos
 	private int clave;
 	private ArrayList<File> listaArchivos;
 	private String mensaje;
 	public static int LOGGEO=0;
 	public static int REGISTRAR=1;
+	public static int TRAER_ARCHIVO=2;
 	
 	public ArrayList<File> getListaArchivos() {
 		return listaArchivos;
@@ -36,7 +37,6 @@ public class UsuarioNuevo implements Serializable{
 	public UsuarioNuevo(String user, int pass) {
 		this.user = user;
 		this.pass = pass;
-	
 	}
 	public UsuarioNuevo(String user, int pass, int clave) {
 		this.user = user;
@@ -46,7 +46,7 @@ public class UsuarioNuevo implements Serializable{
 	public UsuarioNuevo(String user, int pass, String path) {
 		this.user = user;
 		this.pass = pass;
-		this.directorio=path;
+		this.nombreArchivoAabrir=path;
 	}
 
 	public int getClave() {
@@ -59,10 +59,10 @@ public class UsuarioNuevo implements Serializable{
 		this.pass = pass;
 	}
 	public String getDirectorio() {
-		return directorio;
+		return nombreArchivoAabrir;
 	}
 	public void setDirectorio(String directorio) {
-		this.directorio = directorio;
+		this.nombreArchivoAabrir = directorio;
 	}
 	public String getUser() {
 		return user;

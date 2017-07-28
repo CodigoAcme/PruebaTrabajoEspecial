@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Server  {
 	
@@ -95,6 +96,28 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 					
 					int opcion=aux.getClave();
 					
+					if (opcion==UsuarioNuevo.TRAER_ARCHIVO) {
+						File archivo = null;
+						File archivosDelUsuario= new File("./usuarios_registrados/"+aux.getUser());
+						File[] listOfFiles = archivosDelUsuario.listFiles();
+						ArrayList<File> listaArchivos=new ArrayList<>();
+						    for (int i = 0; i < listOfFiles.length; i++) {
+						      if (listOfFiles[i].getName().equals(aux.getDirectorio())) {
+						    	  archivo=new File("./usuarios_registrados/"+aux.getUser()+"/"+listOfFiles[i].getName());  
+						      }
+						    }
+						   Scanner sc=new Scanner(archivo);
+						   String lineasAmandar="";
+						   JTextArea textArea = new JTextArea();
+						   while (sc.hasNextLine()) {
+							   textArea.append(sc.nextLine()+"\n");   
+							   
+						}
+						   sc.close();
+						   ObjectOutputStream envia =new ObjectOutputStream(miSocket.getOutputStream());
+						   envia.writeObject(textArea);
+						   miSocket.close();
+					}
 					
 					if (opcion==UsuarioNuevo.REGISTRAR) {
 						try {
@@ -105,7 +128,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 						}
 						String usuario=aux.getUser();
 						int pass=aux.getPass();
-						areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
+						
 						
 						List<UsuarioNuevo> usuarios=users.getUsers();
 						
@@ -142,7 +165,10 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
+								new File("./usuarios_registrados/"+aux.getUser()).mkdirs();
 								DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
+								areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
+								areatexto.append("Registro exitoso!"+"\n");
 								flujoSalida.writeUTF("Registro exitoso!");
 								miSocket.close();
 								
@@ -163,7 +189,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 						String usuario=aux.getUser();
 						int pass=aux.getPass();
 						
-						areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
+						
 						
 						List<UsuarioNuevo> usuarios=users.getUsers();
 						
@@ -176,13 +202,14 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 										pass==(usuarios.get(i).getPass())){
 									marca = true;
 									usuarioLoggeado=usuarios.get(i);
-									usuarioLoggeado.setDirectorio("./usuarios_registrados/"+usuarioLoggeado.getUser());
+									//usuarioLoggeado.setDirectorio("./usuarios_registrados/"+usuarioLoggeado.getUser());
 									break;
 								}
 							
 							}
 						
 						if(marca){
+							
 							File archivosDelUsuario= new File("./usuarios_registrados/"+usuarioLoggeado.getUser());
 							File[] listOfFiles = archivosDelUsuario.listFiles();
 							ArrayList<File> listaArchivos=new ArrayList<>();
@@ -191,19 +218,33 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 							    	  listaArchivos.add(listOfFiles[i]);
 							      }
 							    }
+							    
+							
 							ObjectOutputStream salida=new ObjectOutputStream(miSocket.getOutputStream());
 							UsuarioNuevo usuarioConMensajeYsusArchivos=new UsuarioNuevo();
 							usuarioConMensajeYsusArchivos.setListaArchivos(listaArchivos);
+							
 							usuarioConMensajeYsusArchivos.setMensaje("Loggeo OK!");
 							salida.writeObject(usuarioConMensajeYsusArchivos);
-							//DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
-							//flujoSalida.writeUTF("Loggeo OK!");
+							areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
+							/*
+							DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
+							flujoSalida.writeUTF("Loggeo OK!");
+							*/
+							
 							miSocket.close();
 								
 						}
 						else{
+							
+							ObjectOutputStream salida=new ObjectOutputStream(miSocket.getOutputStream());
+							UsuarioNuevo usuarioFallido=new UsuarioNuevo();
+							usuarioFallido.setMensaje("Loggeo INCORRECTO!");
+							salida.writeObject(usuarioFallido);
+							/*
 							DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
 							flujoSalida.writeUTF("Loggeo INCORRECTO!");
+							*/
 							miSocket.close();
 								
 						}

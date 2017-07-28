@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.channels.spi.AbstractInterruptibleChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,7 +86,7 @@ public class PantallaEditora implements Runnable{
 			public void windowClosing(WindowEvent arg0) {
 				int rta=JOptionPane.showConfirmDialog(null, "¿Querés salir "+getFrm().getTitle()+" ?", "DANGER", JOptionPane.YES_NO_CANCEL_OPTION);
 				if (rta==JOptionPane.YES_OPTION) {
-					//JOptionPane.showMessageDialog(null, "Saliendo..");
+
 					System.exit(1);
 				}
 			}
@@ -115,8 +117,7 @@ public class PantallaEditora implements Runnable{
 		frm.getContentPane().add(textField);
 		textField.setColumns(10);
 		
-		//fc=new JFileChooser();
-		//fc.setCurrentDirectory(new java.io.File(usuario.getDirectorio()));
+
 		
 		
 		JButton btnSave = new JButton("Guardar");
@@ -152,22 +153,13 @@ public class PantallaEditora implements Runnable{
 		});
 		
 		DefaultListModel modelo = new DefaultListModel();
+		
 		ArrayList<File> listaArchivosAux=new ArrayList<>();
 		listaArchivosAux=usuario.getListaArchivos();
 		for (File file : listaArchivosAux) {
 			modelo.addElement(file.getName());
 		}
-		/*
-		modelo.addElement("Cris");
-		modelo.addElement("Ruben");
-		modelo.addElement("Fer");
-		modelo.addElement("Juancito");
-		modelo.addElement("Micho");
-		modelo.addElement("Calvo");
-		modelo.addElement("Gimenez");
-		modelo.addElement("Perla");
-		modelo.addElement("Ceci");
-		*/
+	
 		
 		
 		scrollPane_2 = new JScrollPane();
@@ -177,6 +169,50 @@ public class PantallaEditora implements Runnable{
 		list_1 = new JList();
 		scrollPane_2.setViewportView(list_1);
 		list_1.setModel(modelo);
+		
+		list_1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+			
+				//1 = NO
+				
+				int rta=JOptionPane.showConfirmDialog(null, "Abrir el archivo "+(String) list_1.getSelectedValue()+"?","Abrir",JOptionPane.YES_NO_CANCEL_OPTION);
+				if (rta==JOptionPane.YES_OPTION) {
+					
+					textField.setText("Archivo "+list_1.getSelectedValue().toString()+" abierto!");
+					
+					
+					textArea.append(list_1.getSelectedValue().toString());
+					
+					try {
+						Socket arbirArchivo=new Socket(LoginNuevo.ipServer, 9999);
+						UsuarioNuevo aux=new UsuarioNuevo();
+						aux.setDirectorio(list_1.getSelectedValue().toString());//nombre del archivoSeleccionado
+						aux.setClave(UsuarioNuevo.TRAER_ARCHIVO);
+						aux.setUser(titulo);
+						ObjectOutputStream envia=new ObjectOutputStream(arbirArchivo.getOutputStream());
+						envia.writeObject(aux);
+						
+						
+						ObjectInputStream recibido=new ObjectInputStream(arbirArchivo.getInputStream());
+						JTextArea aux2=(JTextArea) recibido.readObject();
+						textArea.setText(aux2.getText());
+						arbirArchivo.close();
+						
+						
+					} catch (IOException | ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				if (rta==JOptionPane.CANCEL_OPTION) {
+					JOptionPane.showMessageDialog(null, "Invitacion cancelada","Info",JOptionPane.INFORMATION_MESSAGE);
+				}
+				
+			}
+		});
+		
+		
 		
 		JLabel lblUsuariosConectados = new JLabel("Usuarios conectados:");
 		lblUsuariosConectados.setBounds(413, 12, 160, 52);
@@ -212,7 +248,7 @@ public class PantallaEditora implements Runnable{
 		textArea.setText(loquevenga);
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//NO
+	//NO SE USA
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	private void initialize() {
 	
@@ -254,12 +290,7 @@ public class PantallaEditora implements Runnable{
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				/*
-			String nombre=(String) list.getSelectedValue();
-			ventana=new VentanaChat(nombre);
-			ventana.setVisible(true);
-			*/
-				//1 = NO
+
 				int rta=JOptionPane.showConfirmDialog(null, "Invitar a "+(String) list.getSelectedValue()+"?");
 				if (rta==JOptionPane.YES_OPTION) {
 					JOptionPane.showMessageDialog(null, "Invitacion Enviada");
@@ -274,15 +305,8 @@ public class PantallaEditora implements Runnable{
 		
 		DefaultListModel modelo = new DefaultListModel();
 		
-		modelo.addElement("Cris");
-		modelo.addElement("Ruben");
-		modelo.addElement("Fer");
-		modelo.addElement("Juancito");
-		modelo.addElement("Micho");
-		modelo.addElement("Calvo");
-		modelo.addElement("Gimenez");
-		modelo.addElement("Perla");
-		modelo.addElement("Ceci");
+		modelo.addElement("");
+	
 		
 		list.setModel(modelo);
 		

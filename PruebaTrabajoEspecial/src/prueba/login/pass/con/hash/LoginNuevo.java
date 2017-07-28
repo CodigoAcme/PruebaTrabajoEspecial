@@ -97,19 +97,25 @@ public class LoginNuevo extends JFrame {
 						ObjectOutputStream flujoSalida=new ObjectOutputStream(enviaServidor.getOutputStream());
 						
 						flujoSalida.writeObject(paqueteEnvio);
-						
-						//DataInputStream mensajeServidor=new DataInputStream(enviaServidor.getInputStream());
+						/*
+						DataInputStream mensajeServidor=new DataInputStream(enviaServidor.getInputStream());
+						String respuesta=mensajeServidor.readUTF();
+						*/
 						ObjectInputStream mensajeServidor=new ObjectInputStream(enviaServidor.getInputStream());
 						UsuarioNuevo respuesta=(UsuarioNuevo) mensajeServidor.readObject();
-						//String respuesta=mensajeServidor.readUTF();
+						
+						
 						JOptionPane.showMessageDialog(null, respuesta.getMensaje());
-					
+						
 						enviaServidor.close();
 						
 						if (respuesta.getMensaje().equals("Loggeo OK!")) {
 							PantallaEditora pantalla=new PantallaEditora(textField.getText(), new UsuarioNuevo(textField.getText(), passwordField.getText().hashCode(),respuesta.getListaArchivos()));
 							LoginNuevo.this.dispose();
 							pantalla.getFrm().setVisible(true);
+						}
+						else{//Loggeo incorrecto
+							JOptionPane.showMessageDialog(null, "Loggeo incorrecto");
 						}
 						
 					}
@@ -142,12 +148,13 @@ public class LoginNuevo extends JFrame {
 						
 						flujoSalida.writeObject(paqueteEnvio);
 						
+						
 						DataInputStream mensajeServidor=new DataInputStream(enviaServidor.getInputStream());
 						JOptionPane.showMessageDialog(null, mensajeServidor.readUTF());
 					
-						enviaServidor.close();
 						
-						new File("./usuarios_registrados/"+textField.getText()).mkdirs();
+						mensajeServidor.close();
+						
 						
 					}
 					else{
