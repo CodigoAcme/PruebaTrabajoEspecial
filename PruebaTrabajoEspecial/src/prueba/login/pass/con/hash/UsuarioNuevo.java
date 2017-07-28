@@ -3,6 +3,7 @@ package prueba.login.pass.con.hash;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JTextArea;
 
@@ -14,11 +15,21 @@ public class UsuarioNuevo implements Serializable{
 	private ArrayList<File> listaArchivos;
 	private String mensaje;
 	private JTextArea campoDeArchivo;
+	private ArrayList<HashMap<String, String>> listaMapas=new ArrayList<>();
 	public static int LOGGEO=0;
 	public static int REGISTRAR=1;
 	public static int TRAER_ARCHIVO=2;
 	public static int GUARDAR_ARCHIVO=3;
+	public static int ONLINE=4;
 	
+	
+	
+	public ArrayList<HashMap<String, String>> getListaMapas() {
+		return listaMapas;
+	}
+	public void setListaMapas(ArrayList<HashMap<String, String>> listaMapas) {
+		this.listaMapas = listaMapas;
+	}
 	public JTextArea getCampoDeArchivo() {
 		return campoDeArchivo;
 	}

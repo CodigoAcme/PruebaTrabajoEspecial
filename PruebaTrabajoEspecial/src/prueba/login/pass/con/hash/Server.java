@@ -86,7 +86,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 		
 				DBusuariosNuevo users=new DBusuariosNuevo();
 				UsuarioNuevo aux;
-				
+				ArrayList<HashMap<String, String>> listaMapas=new ArrayList<>();
 			while (true) {	
 				Socket miSocket;
 				try {
@@ -122,6 +122,39 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 						miSocket.close();
 						
 					}
+					if (opcion==UsuarioNuevo.ONLINE) {
+						InetAddress localizacion=miSocket.getInetAddress();
+						//Tengo la direccion IP del socket que se conectó
+						String ipRemota=localizacion.getHostAddress();
+						HashMap<String, String> mapaAux=new HashMap<>();
+						String usuario=aux.getUser();
+						mapaAux.put(ipRemota, usuario);
+						
+						listaMapas.add(mapaAux);
+						aux.setListaMapas(listaMapas);
+						aux.setMensaje("online");
+						for (HashMap<String, String> mapaDentroLista : listaMapas) {
+							for(Map.Entry<String, String> entry: mapaDentroLista.entrySet()){
+								//areatexto.append(entry.getValue()+" "+entry.getKey()+"\n");
+								
+								Socket enviaDestinatarioDelMapa=new Socket(entry.getKey(), 9090);
+								ObjectOutputStream paqueteReEnvioDeMapa=new ObjectOutputStream(enviaDestinatarioDelMapa.getOutputStream());
+								paqueteReEnvioDeMapa.writeObject(aux);
+								paqueteReEnvioDeMapa.close();//CIERRO EL FLUJO DE DATOS
+								enviaDestinatarioDelMapa.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+								
+								miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
+								
+							}
+						}/*
+						//TEST
+						ObjectOutputStream paqueteReEnvioDeMapa=new ObjectOutputStream(miSocket.getOutputStream());
+						paqueteReEnvioDeMapa.writeObject(aux);
+						paqueteReEnvioDeMapa.close();//CIERRO EL FLUJO DE DATOS
+						miSocket.close();
+						*/
+					}
+					
 					if (opcion==UsuarioNuevo.TRAER_ARCHIVO) {
 						File archivo = null;
 						File archivosDelUsuario= new File("./usuarios_registrados/"+aux.getUser());
@@ -193,8 +226,8 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 								}
 								new File("./usuarios_registrados/"+aux.getUser()).mkdirs();
 								DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
-								areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
-								areatexto.append("Registro exitoso!"+"\n");
+								//areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
+								//areatexto.append("Registro exitoso!"+"\n");
 								flujoSalida.writeUTF("Registro exitoso!");
 								miSocket.close();
 								
@@ -252,7 +285,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 							
 							usuarioConMensajeYsusArchivos.setMensaje("Loggeo OK!");
 							salida.writeObject(usuarioConMensajeYsusArchivos);
-							areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
+							//areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
 							/*
 							DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
 							flujoSalida.writeUTF("Loggeo OK!");

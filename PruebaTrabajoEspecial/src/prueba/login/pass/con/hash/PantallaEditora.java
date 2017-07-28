@@ -272,6 +272,38 @@ public class PantallaEditora implements Runnable{
 		frm.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowOpened(WindowEvent arg0) {
+				try {
+					Socket envia=new Socket(LoginNuevo.ipServer, 9999);
+					UsuarioNuevo aux=new UsuarioNuevo();
+					aux.setClave(UsuarioNuevo.ONLINE);;
+					aux.setUser(titulo);
+					ObjectOutputStream salida=new ObjectOutputStream(envia.getOutputStream());
+					salida.writeObject(aux);
+					/*
+					ObjectInputStream recibi=new ObjectInputStream(envia.getInputStream());
+					aux=(UsuarioNuevo) recibi.readObject();
+					
+					ArrayList<HashMap<String, String>> listaAux=aux.getListaMapas();
+					
+					
+					DefaultListModel modelo = new DefaultListModel();
+					
+					
+				
+					
+					list.removeAll();
+					for (HashMap<String, String> mapaDentroLista : listaAux) {
+						for(Map.Entry<String, String> entry: mapaDentroLista.entrySet()){
+								modelo.addElement(entry.getValue());
+						}
+					}
+					list.setModel(modelo);
+					*/
+					envia.close();
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
 				
 			}
 		});
@@ -369,6 +401,43 @@ public class PantallaEditora implements Runnable{
 public void run() {
 	
 	
+	ServerSocket escuchaClientesConectados = null;
+	try {
+		escuchaClientesConectados = new ServerSocket(9090);
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	Socket cliente;
+	UsuarioNuevo usuarioOnline;
+	while (true) {
+		try {
+			
+			cliente=escuchaClientesConectados.accept();
+			ObjectInputStream entrada=new ObjectInputStream(cliente.getInputStream());
+			
+			usuarioOnline=(UsuarioNuevo) entrada.readObject();
+			
+			if (usuarioOnline.getMensaje().equals("online")) {
+				ArrayList<HashMap<String, String>> mapa=usuarioOnline.getListaMapas();
+				
+				DefaultListModel modelo = new DefaultListModel();
+				list.removeAll();
+				for (HashMap<String, String> mapaDentroLista : mapa) {
+					for(Map.Entry<String, String> entry: mapaDentroLista.entrySet()){
+						modelo.addElement(entry.getValue());
+					}
+				}
+				
+				list.setModel(modelo);
+			}
+			
+			
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 		
 	}
 }
