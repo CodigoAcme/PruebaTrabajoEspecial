@@ -187,7 +187,7 @@ public class PantallaEditora implements Runnable{
 					try {
 						Socket arbirArchivo=new Socket(LoginNuevo.ipServer, 9999);
 						UsuarioNuevo aux=new UsuarioNuevo();
-						aux.setDirectorio(list_1.getSelectedValue().toString());//nombre del archivoSeleccionado
+						aux.setNombreArchivoAabrir(list_1.getSelectedValue().toString());//nombre del archivoSeleccionado
 						aux.setClave(UsuarioNuevo.TRAER_ARCHIVO);
 						aux.setUser(titulo);
 						ObjectOutputStream envia=new ObjectOutputStream(arbirArchivo.getOutputStream());
@@ -225,6 +225,47 @@ public class PantallaEditora implements Runnable{
 		btnSave.setEnabled(true);
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				
+					try {
+						JTextArea mandar=new JTextArea();
+						mandar.setText(textArea.getText());
+						Socket envia= new Socket(LoginNuevo.ipServer, 9999);
+						ObjectOutputStream flujoSalida=new ObjectOutputStream(envia.getOutputStream());
+						UsuarioNuevo aux=new UsuarioNuevo();
+						aux.setClave(UsuarioNuevo.GUARDAR_ARCHIVO);
+						
+						JTextArea aux2=new JTextArea();
+						aux2.setText(textArea.getText());
+						
+						aux.setUser(titulo);
+						aux.setCampoDeArchivo(aux2);
+						aux.setNombreArchivoAabrir(list_1.getSelectedValue().toString());//Nombre del archivo a guardar
+						flujoSalida.writeObject(aux);
+						//Recibo la lista de los archivos actualizado
+						ObjectInputStream flujoEntrada=new ObjectInputStream(envia.getInputStream());
+						aux=(UsuarioNuevo) flujoEntrada.readObject();
+						
+						DefaultListModel modelo = new DefaultListModel();
+						
+						ArrayList<File> listaArchivosAux=new ArrayList<>();
+						listaArchivosAux=aux.getListaArchivos();
+						//Vacio la jList
+						list_1.removeAll();
+						for (File file : listaArchivosAux) {
+							modelo.addElement(file.getName());
+						}
+						list_1.setModel(modelo);
+						
+						JOptionPane.showMessageDialog(null, "Guardado!");
+						textField.setText("Archivo guardado con exito!");
+						envia.close();
+						
+						
+					} catch (IOException | ClassNotFoundException e) {
+						
+						e.printStackTrace();
+					}
 				}
 		});
 		

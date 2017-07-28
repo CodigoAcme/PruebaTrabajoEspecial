@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.swing.JTextArea;
+
 public class UsuarioNuevo implements Serializable{
 	private String user;
 	private int pass;
@@ -11,10 +13,18 @@ public class UsuarioNuevo implements Serializable{
 	private int clave;
 	private ArrayList<File> listaArchivos;
 	private String mensaje;
+	private JTextArea campoDeArchivo;
 	public static int LOGGEO=0;
 	public static int REGISTRAR=1;
 	public static int TRAER_ARCHIVO=2;
+	public static int GUARDAR_ARCHIVO=3;
 	
+	public JTextArea getCampoDeArchivo() {
+		return campoDeArchivo;
+	}
+	public void setCampoDeArchivo(JTextArea campoDeArchivo) {
+		this.campoDeArchivo = campoDeArchivo;
+	}
 	public ArrayList<File> getListaArchivos() {
 		return listaArchivos;
 	}
@@ -58,10 +68,10 @@ public class UsuarioNuevo implements Serializable{
 	public void setPass(int pass) {
 		this.pass = pass;
 	}
-	public String getDirectorio() {
+	public String getNombreArchivoAabrir() {
 		return nombreArchivoAabrir;
 	}
-	public void setDirectorio(String directorio) {
+	public void setNombreArchivoAabrir(String directorio) {
 		this.nombreArchivoAabrir = directorio;
 	}
 	public String getUser() {

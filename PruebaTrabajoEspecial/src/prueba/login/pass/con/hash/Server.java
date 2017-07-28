@@ -86,6 +86,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 		
 				DBusuariosNuevo users=new DBusuariosNuevo();
 				UsuarioNuevo aux;
+				
 			while (true) {	
 				Socket miSocket;
 				try {
@@ -95,14 +96,39 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 					aux=(UsuarioNuevo) paqueteDatos.readObject();
 					
 					int opcion=aux.getClave();
-					
+					if (opcion==UsuarioNuevo.GUARDAR_ARCHIVO) {
+						//areatexto.append(aux.getCampoDeArchivo().getText());
+						PrintWriter pw=new PrintWriter(new File("./usuarios_registrados/"+aux.getUser()+"/"+aux.getNombreArchivoAabrir()));
+						pw.print(aux.getCampoDeArchivo().getText());;
+						pw.close();
+						//Localmente se guada bien
+						//Ahora hay que listar los archivos para mandarle la lista acutalizada
+						File archivosDelUsuario= new File("./usuarios_registrados/"+aux.getUser());
+						File[] listOfFiles = archivosDelUsuario.listFiles();
+						ArrayList<File> listaArchivos=new ArrayList<>();
+						    for (int i = 0; i < listOfFiles.length; i++) {
+						      if (listOfFiles[i].isFile()) {
+						    	  listaArchivos.add(listOfFiles[i]);
+						      }
+						    }
+						    
+						
+						ObjectOutputStream salida=new ObjectOutputStream(miSocket.getOutputStream());
+						UsuarioNuevo usuarioConMensajeYsusArchivos=new UsuarioNuevo();
+						usuarioConMensajeYsusArchivos.setListaArchivos(listaArchivos);
+						
+						usuarioConMensajeYsusArchivos.setMensaje("Lista de archivos actualizada y enviada!");
+						salida.writeObject(usuarioConMensajeYsusArchivos);
+						miSocket.close();
+						
+					}
 					if (opcion==UsuarioNuevo.TRAER_ARCHIVO) {
 						File archivo = null;
 						File archivosDelUsuario= new File("./usuarios_registrados/"+aux.getUser());
 						File[] listOfFiles = archivosDelUsuario.listFiles();
 						ArrayList<File> listaArchivos=new ArrayList<>();
 						    for (int i = 0; i < listOfFiles.length; i++) {
-						      if (listOfFiles[i].getName().equals(aux.getDirectorio())) {
+						      if (listOfFiles[i].getName().equals(aux.getNombreArchivoAabrir())) {
 						    	  archivo=new File("./usuarios_registrados/"+aux.getUser()+"/"+listOfFiles[i].getName());  
 						      }
 						    }
