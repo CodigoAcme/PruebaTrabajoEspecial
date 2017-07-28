@@ -43,6 +43,7 @@ public class PantallaEditora implements Runnable{
 
 	private JFrame frm;
 	private JTextField textField;
+	private JTextField nombreArchivo;
 	private JTextArea textArea;
 	private JScrollPane scrollPane;
 	private JScrollPane scrollPane_2;
@@ -109,8 +110,18 @@ public class PantallaEditora implements Runnable{
 		
 		scrollPane = new JScrollPane();
 		
-		scrollPane.setBounds(44, 76, 327, 400);
+		scrollPane.setBounds(44, 135, 327, 341);
 		frm.getContentPane().add(scrollPane);
+		
+		JLabel lblArchivoAbierto = new JLabel("Archivo abierto: ");
+		lblArchivoAbierto.setBounds(42, 90, 143, 33);
+		frm.getContentPane().add(lblArchivoAbierto);
+		
+		nombreArchivo = new JTextField();
+		nombreArchivo.setEditable(false);
+		nombreArchivo.setBounds(166, 97, 205, 19);
+		frm.getContentPane().add(nombreArchivo);
+		nombreArchivo.setColumns(10);
 		
 		textArea = new JTextArea();
 		textArea.addKeyListener(new KeyAdapter() {
@@ -222,6 +233,7 @@ public class PantallaEditora implements Runnable{
 						ObjectInputStream recibido=new ObjectInputStream(arbirArchivo.getInputStream());
 						JTextArea aux2=(JTextArea) recibido.readObject();
 						textArea.setText(aux2.getText());
+						nombreArchivo.setText(list_1.getSelectedValue().toString());
 						arbirArchivo.close();
 						
 						
@@ -250,11 +262,56 @@ public class PantallaEditora implements Runnable{
 		btnSave.setEnabled(true);
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				
+				if (textArea.getText().isEmpty()&&nombreArchivo.getText().isEmpty()) {
+					int dialogResult =JOptionPane.showConfirmDialog(null, "¿Querés guardar un nuevo archivo?", "ADVERTENCIA", JOptionPane.YES_NO_CANCEL_OPTION);
+					if (dialogResult==JOptionPane.YES_OPTION) {
+						String fileName=JOptionPane.showInputDialog(null, "Ingresa el nombre de tu archivo");
+						Socket envia;
+						try {
+							envia = new Socket(LoginNuevo.ipServer, 9999);
+							ObjectOutputStream flujoSalida=new ObjectOutputStream(envia.getOutputStream());
+							UsuarioNuevo aux=new UsuarioNuevo();
+							aux.setClave(UsuarioNuevo.GUARDAR_ARCHIVO);
+							
+							JTextArea aux2=new JTextArea();
+							aux2.setText(textArea.getText());//Estaria vacio
+							
+							aux.setUser(titulo);
+							aux.setCampoDeArchivo(aux2);
+							aux.setNombreArchivoAabrir(fileName);//Nombre del archivo a guardar
+							flujoSalida.writeObject(aux);
+							//Recibo la lista de los archivos actualizado
+							ObjectInputStream flujoEntrada=new ObjectInputStream(envia.getInputStream());
+							aux=(UsuarioNuevo) flujoEntrada.readObject();
+							
+							DefaultListModel modelo = new DefaultListModel();
+							
+							ArrayList<File> listaArchivosAux=new ArrayList<>();
+							listaArchivosAux=aux.getListaArchivos();
+							//Vacio la jList
+							list_1.removeAll();
+							for (File file : listaArchivosAux) {
+								modelo.addElement(file.getName());
+							}
+							list_1.setModel(modelo);
+							
+							JOptionPane.showMessageDialog(null, "Archivo "+fileName+" guardado con exito!");
+							textField.setText("Archivo "+fileName+" guardado con exito!");
+							nombreArchivo.setText(fileName);
+							envia.close();
+						} catch (IOException | ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						}
+					}
+				else{//GUARDAR UN ARCHIVO YA ABIERTO
 					try {
+						////Creo que estas dos lineas estan de mas xq nunca las uso =\
 						JTextArea mandar=new JTextArea();
 						mandar.setText(textArea.getText());
+						// Creo que estas dos lineas estan de mas xq nunca las uso =\
 						Socket envia= new Socket(LoginNuevo.ipServer, 9999);
 						ObjectOutputStream flujoSalida=new ObjectOutputStream(envia.getOutputStream());
 						UsuarioNuevo aux=new UsuarioNuevo();
@@ -265,7 +322,8 @@ public class PantallaEditora implements Runnable{
 						
 						aux.setUser(titulo);
 						aux.setCampoDeArchivo(aux2);
-						aux.setNombreArchivoAabrir(list_1.getSelectedValue().toString());//Nombre del archivo a guardar
+						//aux.setNombreArchivoAabrir(list_1.getSelectedValue().toString());//Nombre del archivo a guardar
+						aux.setNombreArchivoAabrir(nombreArchivo.getText());//Nombre del archivo a guardar
 						flujoSalida.writeObject(aux);
 						//Recibo la lista de los archivos actualizado
 						ObjectInputStream flujoEntrada=new ObjectInputStream(envia.getInputStream());
@@ -282,8 +340,8 @@ public class PantallaEditora implements Runnable{
 						}
 						list_1.setModel(modelo);
 						
-						JOptionPane.showMessageDialog(null, "Guardado!");
-						textField.setText("Archivo guardado con exito!");
+						JOptionPane.showMessageDialog(null, "Archivo "+nombreArchivo.getText()+" guardado con exito!");
+						textField.setText("Archivo "+nombreArchivo.getText()+" guardado con exito!");
 						envia.close();
 						
 						
@@ -291,7 +349,8 @@ public class PantallaEditora implements Runnable{
 						
 						e.printStackTrace();
 					}
-				}
+				}//fin else
+			}//FIN ACTION PERFORMED
 		});
 		
 		frm.addWindowListener(new WindowAdapter() {

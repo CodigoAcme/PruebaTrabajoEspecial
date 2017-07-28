@@ -97,6 +97,7 @@ public class LoginNuevo extends JFrame {
 						ObjectOutputStream flujoSalida=new ObjectOutputStream(enviaServidor.getOutputStream());
 						
 						flujoSalida.writeObject(paqueteEnvio);
+						
 						/*
 						DataInputStream mensajeServidor=new DataInputStream(enviaServidor.getInputStream());
 						String respuesta=mensajeServidor.readUTF();
@@ -105,7 +106,7 @@ public class LoginNuevo extends JFrame {
 						UsuarioNuevo respuesta=(UsuarioNuevo) mensajeServidor.readObject();
 						
 						
-						JOptionPane.showMessageDialog(null, respuesta.getMensaje());
+						//JOptionPane.showMessageDialog(null, respuesta.getMensaje());
 						
 						enviaServidor.close();
 						

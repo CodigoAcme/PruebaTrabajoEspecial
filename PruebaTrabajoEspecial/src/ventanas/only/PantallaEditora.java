@@ -38,6 +38,7 @@ public class PantallaEditora {
 	private JScrollPane scrollPane_1;
 	private JList list_1;
 	private JScrollPane scrollPane_2;
+	private JTextField nombreArchivo;
 	/**
 	 * Launch the application.
 	 */
@@ -227,28 +228,28 @@ public class PantallaEditora {
 			public void windowClosing(WindowEvent arg0) {
 				int rta=JOptionPane.showConfirmDialog(null, "¿Querés salir PEBETE?", "DANGER", JOptionPane.YES_NO_CANCEL_OPTION);
 				if (rta==JOptionPane.YES_OPTION) {
-					JOptionPane.showMessageDialog(null, "Saliendo..");
+					
 					System.exit(1);
 				}
 			}
 		});
 	
-		frm.setTitle("Editor MultiPersona @Gutiérrez-Montenegro");
+		frm.setTitle("Prototipo");
 		frm.setBounds(100, 100, 700, 600);
-		//frm.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		
 		frm.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frm.getContentPane().setLayout(null);
 		
 		scrollPane = new JScrollPane();
 		
-		scrollPane.setBounds(44, 76, 327, 400);
+		scrollPane.setBounds(44, 135, 327, 341);
 		frm.getContentPane().add(scrollPane);
 		
 		textArea = new JTextArea();
 		textArea.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent arg0) {
-				//JOptionPane.showMessageDialog(null, "Se presionó la tecla: "+arg0.getKeyChar());
+				
 			}
 		});
 	
@@ -272,13 +273,14 @@ public class PantallaEditora {
 					fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 					if (fc.showOpenDialog(fc)==JFileChooser.APPROVE_OPTION) {
 						sc = new Scanner(new File(fc.getSelectedFile().getAbsolutePath()));
-						
+						textArea.setText("");
 						while (sc.hasNextLine()) {
 							textArea.append(sc.nextLine()+"\n");
 					}
 					textField.setText("");
 					File f=new File(fc.getSelectedFile().getPath());
 					textField.setText("Se abrió el archivo: "+f.getName());
+					nombreArchivo.setText(f.getName());
 					sc.close();
 					}else{
 						textField.setText("No seleccionó ningún archivo para abrir!");
@@ -289,7 +291,7 @@ public class PantallaEditora {
 				}
 			}
 		});
-		btnOpen.setIcon(new ImageIcon(PantallaEditora.class.getResource("/images/folder.png")));
+		//btnOpen.setIcon(new ImageIcon(PantallaEditora.class.getResource("/images/folder.png")));
 		btnOpen.setBounds(44, 12, 141, 52);
 		frm.getContentPane().add(btnOpen);
 		
@@ -352,10 +354,24 @@ public class PantallaEditora {
 		scrollPane_2.setViewportView(list_1);
 		list_1.setModel(modelo);
 		
+		JLabel lblArchivos = new JLabel("MisArchivos");
+		lblArchivos.setBounds(413, 302, 117, 15);
+		frm.getContentPane().add(lblArchivos);
+		
+		JLabel lblArchivoAbierto = new JLabel("Archivo abierto: ");
+		lblArchivoAbierto.setBounds(42, 90, 143, 33);
+		frm.getContentPane().add(lblArchivoAbierto);
+		
+		nombreArchivo = new JTextField();
+		nombreArchivo.setEditable(false);
+		nombreArchivo.setBounds(166, 97, 205, 19);
+		frm.getContentPane().add(nombreArchivo);
+		nombreArchivo.setColumns(10);
+		
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (textArea.getLineCount()<=1) {
-					
+				//if (textArea.getLineCount()<=1) {
+				if (textArea.getText().isEmpty()&&nombreArchivo.getText().isEmpty()) {
 					int dialogResult =JOptionPane.showConfirmDialog(null, "¿Querés guardar un nuevo archivo?", "ADVERTENCIA", JOptionPane.YES_NO_CANCEL_OPTION);
 					if (dialogResult==JOptionPane.YES_OPTION) {
 						JFileChooser saveFile = new JFileChooser();
@@ -366,6 +382,9 @@ public class PantallaEditora {
 	                           PrintWriter pw = new PrintWriter(new File(saveFile.getSelectedFile().getPath()));
 	                           pw.write(textArea.getText());
 	                           pw.close();
+	                           textField.setText("Se guardo el archivo: "+saveFile.getSelectedFile().getName());
+								//JOptionPane.showMessageDialog(null, "Se guardo el archivo: "+saveFile.getSelectedFile().getName());
+								nombreArchivo.setText(saveFile.getSelectedFile().getName());
 	                        }catch(Exception ex){
 
 	                        }
@@ -379,6 +398,7 @@ public class PantallaEditora {
 						try {
 							pw = new PrintWriter(new File(saveFile.getSelectedFile().getAbsolutePath()));
 							pw.print(textArea.getText());
+							textField.setText("Se guardo el archivo "+saveFile.getSelectedFile().getName());
 						} catch (FileNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -387,6 +407,7 @@ public class PantallaEditora {
 							pw.close();
 							File f2=new File(saveFile.getSelectedFile().getAbsolutePath());
 							textField.setText("Se guardo el archivo: "+f2.getName());
+							//JOptionPane.showMessageDialog(null, "Se guardo el archivo: "+f2.getName());
 						}
                     }
 				}
