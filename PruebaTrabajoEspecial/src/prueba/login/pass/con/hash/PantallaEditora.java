@@ -86,8 +86,22 @@ public class PantallaEditora implements Runnable{
 			public void windowClosing(WindowEvent arg0) {
 				int rta=JOptionPane.showConfirmDialog(null, "¿Querés salir "+getFrm().getTitle()+" ?", "DANGER", JOptionPane.YES_NO_CANCEL_OPTION);
 				if (rta==JOptionPane.YES_OPTION) {
-
-					System.exit(1);
+					//eliminar de la lista de conectados
+					
+					try {
+						Socket envia= new Socket(LoginNuevo.ipServer, 9999);
+						ObjectOutputStream flujoSalida=new ObjectOutputStream(envia.getOutputStream());
+						UsuarioNuevo aux=new UsuarioNuevo();
+						aux.setClave(UsuarioNuevo.DESCONECCION);
+						aux.setUser(titulo);
+						flujoSalida.writeObject(aux);
+						envia.close();
+						System.exit(1);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 				}
 			}
 		});
@@ -279,26 +293,7 @@ public class PantallaEditora implements Runnable{
 					aux.setUser(titulo);
 					ObjectOutputStream salida=new ObjectOutputStream(envia.getOutputStream());
 					salida.writeObject(aux);
-					/*
-					ObjectInputStream recibi=new ObjectInputStream(envia.getInputStream());
-					aux=(UsuarioNuevo) recibi.readObject();
 					
-					ArrayList<HashMap<String, String>> listaAux=aux.getListaMapas();
-					
-					
-					DefaultListModel modelo = new DefaultListModel();
-					
-					
-				
-					
-					list.removeAll();
-					for (HashMap<String, String> mapaDentroLista : listaAux) {
-						for(Map.Entry<String, String> entry: mapaDentroLista.entrySet()){
-								modelo.addElement(entry.getValue());
-						}
-					}
-					list.setModel(modelo);
-					*/
 					envia.close();
 				} catch (IOException e) {
 					
@@ -369,9 +364,7 @@ public class PantallaEditora implements Runnable{
 					JOptionPane.showMessageDialog(null, "Invitacion Enviada");
 					textField.setText("Cuando "+list.getSelectedValue()+ " se conecte, aca diría: "+list.getSelectedValue().toString()+" se conectó!");
 				}
-				if (rta==JOptionPane.CANCEL_OPTION) {
-					JOptionPane.showMessageDialog(null, "Invitacion cancelada");
-				}
+			
 				
 			}
 		});
@@ -417,7 +410,19 @@ public void run() {
 			ObjectInputStream entrada=new ObjectInputStream(cliente.getInputStream());
 			
 			usuarioOnline=(UsuarioNuevo) entrada.readObject();
-			
+			if (usuarioOnline.getMensaje().equals("desconeccion")) {
+				ArrayList<HashMap<String, String>> mapa=usuarioOnline.getListaMapas();
+				
+				DefaultListModel modelo = new DefaultListModel();
+				list.removeAll();
+				for (HashMap<String, String> mapaDentroLista : mapa) {
+					for(Map.Entry<String, String> entry: mapaDentroLista.entrySet()){
+						modelo.addElement(entry.getValue());
+					}
+				}
+				
+				list.setModel(modelo);
+			}
 			if (usuarioOnline.getMensaje().equals("online")) {
 				ArrayList<HashMap<String, String>> mapa=usuarioOnline.getListaMapas();
 				

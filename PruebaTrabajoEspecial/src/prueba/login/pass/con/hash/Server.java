@@ -122,12 +122,57 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 						miSocket.close();
 						
 					}
+					if (opcion==UsuarioNuevo.DESCONECCION) {
+						
+						InetAddress localizacion=miSocket.getInetAddress();
+						
+						String ipRemota=localizacion.getHostAddress();
+						
+						areatexto.append(aux.getUser()+" se desconectó"+"\n");
+						
+						
+						int indiceDeListaAeliminar = 0;
+						int contador=0;
+						for (HashMap<String, String> mapa : listaMapas) {
+							for(Map.Entry<String, String> entry: mapa.entrySet()){
+								if (entry.getKey().equals(ipRemota)) {
+									indiceDeListaAeliminar=contador;
+								}
+							}
+							contador++;
+						}
+						
+						listaMapas.remove(indiceDeListaAeliminar);
+						
+						
+						aux.setListaMapas(listaMapas);
+						
+						aux.setMensaje("desconeccion");
+						
+						for (HashMap<String, String> mapa : listaMapas) {
+							for(Map.Entry<String, String> entry: mapa.entrySet()){
+								Socket enviaDestinatario=new Socket(entry.getKey(), 9090);
+								
+								//Como voy a mandar un objeto, necesito un ObjectOutputStream
+								
+								ObjectOutputStream paqueteReEnvio=new ObjectOutputStream(enviaDestinatario.getOutputStream());
+								
+								paqueteReEnvio.writeObject(aux);
+								paqueteReEnvio.close();//CIERRO EL FLUJO DE DATOS
+								enviaDestinatario.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO
+								
+								miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
+							}
+							
+						}
+					}
 					if (opcion==UsuarioNuevo.ONLINE) {
 						InetAddress localizacion=miSocket.getInetAddress();
 						//Tengo la direccion IP del socket que se conectó
 						String ipRemota=localizacion.getHostAddress();
 						HashMap<String, String> mapaAux=new HashMap<>();
 						String usuario=aux.getUser();
+						areatexto.append(aux.getUser()+" se conectó"+"\n");
 						mapaAux.put(ipRemota, usuario);
 						
 						listaMapas.add(mapaAux);

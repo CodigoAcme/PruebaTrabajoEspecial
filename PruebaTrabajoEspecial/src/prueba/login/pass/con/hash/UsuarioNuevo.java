@@ -21,6 +21,7 @@ public class UsuarioNuevo implements Serializable{
 	public static int TRAER_ARCHIVO=2;
 	public static int GUARDAR_ARCHIVO=3;
 	public static int ONLINE=4;
+	public static int DESCONECCION=5;
 	
 	
 	
