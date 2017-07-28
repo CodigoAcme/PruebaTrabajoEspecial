@@ -5,6 +5,8 @@ package prueba.login.pass.con.hash;
 import javax.swing.*;
 
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -17,6 +19,7 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +43,74 @@ public class Server  {
 }
 
 class Marco extends JFrame implements Runnable{ //clase que contruye el marco
-	
+	private ArrayList<HashMap<String, String>> listaMapas=new ArrayList<>();
+	class EnviaDesconeccion implements WindowListener{
+
+		@Override
+		public void windowActivated(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowClosed(WindowEvent e) {
+		
+			
+		}
+
+		@Override
+		public void windowClosing(WindowEvent e) {
+			
+			//Todo este bloque se ejecutará ni bien se cierrela App
+			try {
+				UsuarioNuevo aux=new UsuarioNuevo();
+				
+				aux.setMensaje("servidorCaido");
+				
+				for (HashMap<String, String> mapaDentroLista : listaMapas) {
+					for(Map.Entry<String, String> entry: mapaDentroLista.entrySet()){
+						Socket enviaDestinatarioDelMapa=new Socket(entry.getKey(), 9090);
+						ObjectOutputStream paqueteReEnvioDeMapa=new ObjectOutputStream(enviaDestinatarioDelMapa.getOutputStream());
+						paqueteReEnvioDeMapa.writeObject(aux);
+						paqueteReEnvioDeMapa.close();//CIERRO EL FLUJO DE DATOS
+						enviaDestinatarioDelMapa.close();//CIERRO EL SOCKET DEL CLIENTE REENVIADO		
+					}
+				}
+				
+			} catch (UnknownHostException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}	
+		}
+
+		@Override
+		public void windowDeactivated(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowDeiconified(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowIconified(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void windowOpened(WindowEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
 	public Marco(){
 		setTitle("Soy el servidor!");
 		setBounds(1200,300,280,350);				
@@ -56,6 +126,9 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 		add(milamina);
 		
 		setVisible(true);
+		
+		EnviaDesconeccion eventoDesconeccionServidor=new EnviaDesconeccion();
+		addWindowListener(eventoDesconeccionServidor);
 		
 		Thread miHilo=new Thread(this);
 		miHilo.start();
@@ -86,7 +159,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 		
 				DBusuariosNuevo users=new DBusuariosNuevo();
 				UsuarioNuevo aux;
-				ArrayList<HashMap<String, String>> listaMapas=new ArrayList<>();
+				
 			while (true) {	
 				Socket miSocket;
 				try {
@@ -212,13 +285,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 								miSocket.close();//CIERRO EL SOCKET DEL CLIENTE QUE LLEGO
 								
 							}
-						}/*
-						//TEST
-						ObjectOutputStream paqueteReEnvioDeMapa=new ObjectOutputStream(miSocket.getOutputStream());
-						paqueteReEnvioDeMapa.writeObject(aux);
-						paqueteReEnvioDeMapa.close();//CIERRO EL FLUJO DE DATOS
-						miSocket.close();
-						*/
+						}
 					}
 					
 					if (opcion==UsuarioNuevo.TRAER_ARCHIVO) {
@@ -351,11 +418,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 							
 							usuarioConMensajeYsusArchivos.setMensaje("Loggeo OK!");
 							salida.writeObject(usuarioConMensajeYsusArchivos);
-							//areatexto.append("IP "+miSocket.getInetAddress().getHostAddress()+" "+aux.getUser()+" "+aux.getPass()+"\n");
-							/*
-							DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
-							flujoSalida.writeUTF("Loggeo OK!");
-							*/
+					
 							
 							miSocket.close();
 								
@@ -366,10 +429,7 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 							UsuarioNuevo usuarioFallido=new UsuarioNuevo();
 							usuarioFallido.setMensaje("Loggeo INCORRECTO!");
 							salida.writeObject(usuarioFallido);
-							/*
-							DataOutputStream flujoSalida=new DataOutputStream(miSocket.getOutputStream());
-							flujoSalida.writeUTF("Loggeo INCORRECTO!");
-							*/
+						
 							miSocket.close();
 								
 						}

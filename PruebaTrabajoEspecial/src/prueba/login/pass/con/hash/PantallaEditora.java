@@ -209,14 +209,11 @@ public class PantallaEditora implements Runnable{
 		list_1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-			
-				//1 = NO
 				
 				int rta=JOptionPane.showConfirmDialog(null, "Abrir el archivo "+(String) list_1.getSelectedValue()+"?","Abrir",JOptionPane.YES_NO_CANCEL_OPTION);
 				if (rta==JOptionPane.YES_OPTION) {
 					
 					textField.setText("Archivo "+list_1.getSelectedValue().toString()+" abierto!");
-					
 					
 					textArea.append(list_1.getSelectedValue().toString());
 					
@@ -512,6 +509,10 @@ public void run() {
 				}
 				
 				list.setModel(modelo);
+			}
+			if (usuarioOnline.getMensaje().equals("servidorCaido")) {
+				JOptionPane.showMessageDialog(null, "Hubo problemas con el servidor.", "Servidor caido", JOptionPane.WARNING_MESSAGE);
+				System.exit(1);
 			}
 			
 			
