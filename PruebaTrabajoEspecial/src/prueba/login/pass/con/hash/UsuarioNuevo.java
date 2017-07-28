@@ -16,15 +16,24 @@ public class UsuarioNuevo implements Serializable{
 	private String mensaje;
 	private JTextArea campoDeArchivo;
 	private ArrayList<HashMap<String, String>> listaMapas=new ArrayList<>();
+	private String invitado;
 	public static int LOGGEO=0;
 	public static int REGISTRAR=1;
 	public static int TRAER_ARCHIVO=2;
 	public static int GUARDAR_ARCHIVO=3;
 	public static int ONLINE=4;
 	public static int DESCONECCION=5;
+	public static int INVITACION=6;
 	
 	
 	
+	
+	public String getInvitado() {
+		return invitado;
+	}
+	public void setInvitado(String invitado) {
+		this.invitado = invitado;
+	}
 	public ArrayList<HashMap<String, String>> getListaMapas() {
 		return listaMapas;
 	}

@@ -122,6 +122,27 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 						miSocket.close();
 						
 					}
+					if (opcion==UsuarioNuevo.INVITACION) {
+						
+						for (HashMap<String, String> mapa : listaMapas) {
+							for(Map.Entry<String, String> entry: mapa.entrySet()){
+								if (entry.getValue().equals(aux.getInvitado())) {
+						
+									areatexto.append(aux.getUser()+" invito a "+entry.getValue()+"\n");
+									Socket invitacion=new Socket(entry.getKey(), 9090);
+									ObjectOutputStream flujoSalida=new ObjectOutputStream(invitacion.getOutputStream());
+									aux.setMensaje("invitacion");
+									flujoSalida.writeObject(aux);
+									flujoSalida.close();
+									invitacion.close();
+									
+									
+								}
+							}
+						
+						}
+						miSocket.close();//de la invitacion
+					}
 					if (opcion==UsuarioNuevo.DESCONECCION) {
 						
 						InetAddress localizacion=miSocket.getInetAddress();

@@ -154,14 +154,25 @@ public class PantallaEditora implements Runnable{
 				int rta=JOptionPane.showConfirmDialog(null, "Invitar a "+(String) list.getSelectedValue()+"?","Invitación",JOptionPane.YES_NO_CANCEL_OPTION);
 				if (rta==JOptionPane.YES_OPTION) {
 					JOptionPane.showMessageDialog(null, "Invitacion Enviada","Info",JOptionPane.INFORMATION_MESSAGE);
-					textField.setText("Cuando "+list.getSelectedValue()+ " se conecte, aca diría: "+list.getSelectedValue().toString()+" se conectó!");
-					PantallaEditora pantallaDeColaboracion=new PantallaEditora();
-					pantallaDeColaboracion.ponerEnTextArea(textArea.getText());
-					pantallaDeColaboracion.getFrm().setVisible(true);
+					
+					try {
+						Socket invitacion= new Socket(LoginNuevo.ipServer, 9999);
+						ObjectOutputStream flujoSalida=new ObjectOutputStream(invitacion.getOutputStream());
+						UsuarioNuevo senial=new UsuarioNuevo();
+						senial.setClave(UsuarioNuevo.INVITACION);
+						senial.setUser(titulo);
+						senial.setInvitado((String) list.getSelectedValue());
+						flujoSalida.writeObject(senial);
+						invitacion.close();
+						
+						
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
 				}
-				if (rta==JOptionPane.CANCEL_OPTION) {
-					JOptionPane.showMessageDialog(null, "Invitacion cancelada","Info",JOptionPane.INFORMATION_MESSAGE);
-				}
+				
 				
 			}
 		});
@@ -338,6 +349,7 @@ public class PantallaEditora implements Runnable{
 		
 		textField = new JTextField();
 		textField.setEditable(false);
+		
 		textField.setBounds(44, 515, 529, 19);
 		frm.getContentPane().add(textField);
 		textField.setColumns(10);
@@ -353,7 +365,6 @@ public class PantallaEditora implements Runnable{
 		
 		list = new JList();
 		list.setVisible(false);
-		list.setEnabled(false);
 		scrollPane_1.setViewportView(list);
 		list.addMouseListener(new MouseAdapter() {
 			@Override
@@ -362,7 +373,7 @@ public class PantallaEditora implements Runnable{
 				int rta=JOptionPane.showConfirmDialog(null, "Invitar a "+(String) list.getSelectedValue()+"?");
 				if (rta==JOptionPane.YES_OPTION) {
 					JOptionPane.showMessageDialog(null, "Invitacion Enviada");
-					textField.setText("Cuando "+list.getSelectedValue()+ " se conecte, aca diría: "+list.getSelectedValue().toString()+" se conectó!");
+					
 				}
 			
 				
@@ -410,6 +421,16 @@ public void run() {
 			ObjectInputStream entrada=new ObjectInputStream(cliente.getInputStream());
 			
 			usuarioOnline=(UsuarioNuevo) entrada.readObject();
+			if (usuarioOnline.getMensaje().equals("invitacion")) {
+				int rta=JOptionPane.showConfirmDialog(null, usuarioOnline.getUser()+" te invi"
+						+ "to a colaborar con su documento. Aceptás?", "INVITACIÓN", JOptionPane.YES_NO_CANCEL_OPTION);
+				if (rta==JOptionPane.YES_OPTION) {
+					JOptionPane.showMessageDialog(null, "Comienza la edicion en paralelo del documento..");
+					PantallaEditora paralelo=new PantallaEditora();
+					paralelo.ponerEnTextArea(textArea.getText());
+					paralelo.getFrm().setVisible(true);
+				}
+			}
 			if (usuarioOnline.getMensaje().equals("desconeccion")) {
 				ArrayList<HashMap<String, String>> mapa=usuarioOnline.getListaMapas();
 				
