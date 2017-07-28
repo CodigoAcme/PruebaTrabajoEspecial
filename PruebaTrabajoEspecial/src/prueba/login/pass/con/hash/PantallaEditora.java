@@ -242,10 +242,6 @@ public class PantallaEditora implements Runnable{
 						e1.printStackTrace();
 					}
 				}
-				if (rta==JOptionPane.CANCEL_OPTION) {
-					JOptionPane.showMessageDialog(null, "Invitacion cancelada","Info",JOptionPane.INFORMATION_MESSAGE);
-				}
-				
 			}
 		});
 		
@@ -262,7 +258,8 @@ public class PantallaEditora implements Runnable{
 		btnSave.setEnabled(true);
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (textArea.getText().isEmpty()&&nombreArchivo.getText().isEmpty()) {
+				if (textArea.getText().isEmpty()&&nombreArchivo.getText().isEmpty()||
+						!textArea.getText().isEmpty()&&nombreArchivo.getText().isEmpty()) {
 					int dialogResult =JOptionPane.showConfirmDialog(null, "¿Querés guardar un nuevo archivo?", "ADVERTENCIA", JOptionPane.YES_NO_CANCEL_OPTION);
 					if (dialogResult==JOptionPane.YES_OPTION) {
 						String fileName=JOptionPane.showInputDialog(null, "Ingresa el nombre de tu archivo");

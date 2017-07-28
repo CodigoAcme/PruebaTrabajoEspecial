@@ -42,7 +42,7 @@ public class Server  {
 class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 	
 	public Marco(){
-		setTitle("Soy yo!");
+		setTitle("Soy el servidor!");
 		setBounds(1200,300,280,350);				
 			
 		JPanel milamina= new JPanel();
