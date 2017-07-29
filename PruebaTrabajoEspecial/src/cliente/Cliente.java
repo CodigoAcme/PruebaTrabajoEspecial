@@ -87,59 +87,6 @@ public class Cliente extends JFrame implements Runnable {
 	            e.printStackTrace();
 	        }
 	    }
-////////////////////
-	public Cliente(Socket socket, String texto) {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(new GridLayout(0, 1, 0, 0));
-		
-		textArea = new JTextArea();
-		textArea.setText(texto);
-		contentPane.add(textArea);
-
-	
-	    /**
-	     * Contruye una instancia de esta clase, lanzando un hilo para atender al
-	     * socket.
-	     * @param socket El socket
-	     * @param panel El panel del usuario
-	     */
-	 
-	        try
-	        {
-	            dataInput = new DataInputStream(socket.getInputStream());
-	            dataOutput = new DataOutputStream(socket.getOutputStream());
-	         
-	            /**
-	    	     * Recoge el texto del panel y lo env�a por el socket.
-	    	     * El panel llamar� a este m�todo cuando el usuario escriba algo
-	    	     */
-	            textArea.addKeyListener(new KeyAdapter() {
-	    			@Override
-	    			public void keyReleased(KeyEvent arg0) {
-	
-	    				 try
-	    			        {
-	    					   indice_ultima_linea_2 = textArea.getCaretPosition();
-	    			            dataOutput.writeUTF(textArea.getText());
-	    			        } catch (Exception excepcion)
-	    			        {
-	    			            excepcion.printStackTrace();
-	    			        }
-	    				
-	    			}
-	    			
-	    		});
-	            Thread hilo = new Thread(this);
-	            hilo.start();
-	        } catch (Exception e)
-	        {
-	            e.printStackTrace();
-	        }
-	    }
 
 	    /**
 	     * M�todo run para antender al socket. Todo lo que llega por el socket se
@@ -153,8 +100,8 @@ public class Cliente extends JFrame implements Runnable {
 //	            	 indice_ultima_linea = textArea.getDocument().getLength(); //retorna el numero de linea
 	            	
 	                String texto = dataInput.readUTF();
-	                //textArea.setText(texto);
-	                textArea.append(texto);
+	                textArea.setText(texto);
+	                
 	                textArea.setCaretPosition(indice_ultima_linea_2); //ubica el cursor al final
 	            }
 	        }catch (EOFException e2)

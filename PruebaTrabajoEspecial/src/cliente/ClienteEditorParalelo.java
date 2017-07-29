@@ -46,21 +46,7 @@ public class ClienteEditorParalelo
         }
        
     }
-    public ClienteEditorParalelo(String texto)
-    {
-        try
-        {
-      
-            socket = new Socket("localhost", 5557);
-            Cliente control = new Cliente(socket,texto);
-            control.setVisible(true);
-            control.setLocationRelativeTo(null);
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-       
-    }
+
 
 
 }
