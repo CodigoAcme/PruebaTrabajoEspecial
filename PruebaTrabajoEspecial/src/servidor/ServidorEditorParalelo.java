@@ -1,19 +1,10 @@
 package servidor;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 /**
  * Servidor de chat.
@@ -22,7 +13,7 @@ import javax.swing.JTextArea;
  * 
  *
  */
-public class ServidorChat
+public class ServidorEditorParalelo
 {
     /** Lista en la que se guaradara toda la conversacion */
     private DefaultListModel<String> charla = new DefaultListModel<String>();
@@ -33,14 +24,14 @@ public class ServidorChat
      */
     public static void main(String[] args)
     {
-        new ServidorChat();
+        new ServidorEditorParalelo();
     }
 
     /**
      * Se mete en un bucle infinito para ateder clientes, lanzando un hilo
      * para cada uno de ellos.
      */
-    public ServidorChat()
+    public ServidorEditorParalelo()
     {
         try
         {	

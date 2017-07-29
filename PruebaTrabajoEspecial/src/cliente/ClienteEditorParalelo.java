@@ -1,12 +1,10 @@
 package cliente;
+
 /**
  * 
  * Cliente de un chat
  */
 import java.net.Socket;
-
-import javax.swing.JFrame;
-import javax.swing.WindowConstants;
 
 /**
  * Clase con el main de un cliente del chat.
@@ -15,7 +13,7 @@ import javax.swing.WindowConstants;
  *
  */
 
-public class ClienteChat
+public class ClienteEditorParalelo
 {
     /** Socket con el servidor del chat */
     private Socket socket;
@@ -27,19 +25,34 @@ public class ClienteChat
      */
     public static void main(String[] args)
     {
-        new ClienteChat();
+        new ClienteEditorParalelo();
     }
 
     /**
      * Crea la ventana, establece la conexi�n e instancia al controlador.
      */
-    public ClienteChat()
+    public ClienteEditorParalelo()
     {
         try
         {
       
             socket = new Socket("localhost", 5557);
             Cliente control = new Cliente(socket);
+            control.setVisible(true);
+            control.setLocationRelativeTo(null);
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+       
+    }
+    public ClienteEditorParalelo(String texto)
+    {
+        try
+        {
+      
+            socket = new Socket("localhost", 5557);
+            Cliente control = new Cliente(socket,texto);
             control.setVisible(true);
             control.setLocationRelativeTo(null);
         } catch (Exception e)

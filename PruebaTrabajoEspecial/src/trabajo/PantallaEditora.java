@@ -8,6 +8,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import cliente.ClienteEditorParalelo;
+import servidor.ServidorEditorParalelo;
+
 import java.awt.event.ActionListener;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -76,6 +80,7 @@ public class PantallaEditora implements Runnable{
 		initialize();
 	}
 	public PantallaEditora(String titulo, UsuarioNuevo in) {
+		
 		frm = new JFrame();
 		
 		frm.setTitle(titulo);
@@ -500,9 +505,11 @@ public void run() {
 					senial.setClave(UsuarioNuevo.COLABORANDO);
 					
 					
-					PantallaEditora paralelo=new PantallaEditora();
-					paralelo.ponerEnTextArea(usuarioOnline.getCampoDeArchivo().getText());
-					paralelo.getFrm().setVisible(true);
+					//PantallaEditora paralelo=new PantallaEditora();
+					//paralelo.ponerEnTextArea(usuarioOnline.getCampoDeArchivo().getText());
+					//paralelo.getFrm().setVisible(true);
+					//
+					
 				}
 			}
 			if (usuarioOnline.getMensaje().equals("desconeccion")) {
