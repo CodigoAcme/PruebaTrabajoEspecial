@@ -1,4 +1,4 @@
-package prueba.login.pass.con.hash;
+package trabajo;
 
 import java.awt.EventQueue;
 
@@ -170,14 +170,28 @@ public class PantallaEditora implements Runnable{
 						Socket invitacion= new Socket(LoginNuevo.ipServer, 9999);
 						ObjectOutputStream flujoSalida=new ObjectOutputStream(invitacion.getOutputStream());
 						UsuarioNuevo senial=new UsuarioNuevo();
+						JTextArea areaAux=textArea;
 						senial.setClave(UsuarioNuevo.INVITACION);
 						senial.setUser(titulo);
+						senial.setCampoDeArchivo(areaAux);
 						senial.setInvitado((String) list.getSelectedValue());
 						flujoSalida.writeObject(senial);
+						
+						ObjectInputStream flujoEntrada=new ObjectInputStream(invitacion.getInputStream());
+						senial=(UsuarioNuevo) flujoEntrada.readObject();
+						if (senial.getRespuestaJpane()==JOptionPane.YES_OPTION) {
+							usuario.setClave(UsuarioNuevo.COLABORANDO);//VER
+							usuario.setColaborador(senial.getColaborador());
+							//Aca se liberaria el listerner de teclado, kesyPress
+							invitacion.close();
+							JOptionPane.showMessageDialog(null, (String) list.getSelectedValue()+" acepto la invitacion!");
+						}
+						
+						
 						invitacion.close();
 						
 						
-					} catch (IOException e1) {
+					} catch (IOException | ClassNotFoundException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
@@ -477,10 +491,17 @@ public void run() {
 			if (usuarioOnline.getMensaje().equals("invitacion")) {
 				int rta=JOptionPane.showConfirmDialog(null, usuarioOnline.getUser()+" te invi"
 						+ "to a colaborar con su documento. Aceptás?", "INVITACIÓN", JOptionPane.YES_NO_CANCEL_OPTION);
+				UsuarioNuevo senial=new UsuarioNuevo();
+				senial.setRespuestaJpane(rta);
 				if (rta==JOptionPane.YES_OPTION) {
+					
 					JOptionPane.showMessageDialog(null, "Comienza la edicion en paralelo del documento..");
+					
+					senial.setClave(UsuarioNuevo.COLABORANDO);
+					
+					
 					PantallaEditora paralelo=new PantallaEditora();
-					paralelo.ponerEnTextArea(textArea.getText());
+					paralelo.ponerEnTextArea(usuarioOnline.getCampoDeArchivo().getText());
 					paralelo.getFrm().setVisible(true);
 				}
 			}
@@ -504,7 +525,10 @@ public void run() {
 				list.removeAll();
 				for (HashMap<String, String> mapaDentroLista : mapa) {
 					for(Map.Entry<String, String> entry: mapaDentroLista.entrySet()){
-						modelo.addElement(entry.getValue());
+						
+							modelo.addElement(entry.getValue());
+						
+						
 					}
 				}
 				

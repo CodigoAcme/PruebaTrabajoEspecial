@@ -1,4 +1,4 @@
-package prueba.login.pass.con.hash;
+package trabajo;
 
 import java.io.File;
 import java.io.Serializable;
@@ -15,8 +15,10 @@ public class UsuarioNuevo implements Serializable{
 	private ArrayList<File> listaArchivos;
 	private String mensaje;
 	private JTextArea campoDeArchivo;
+	private HashMap<String, String> colaborador;
 	private ArrayList<HashMap<String, String>> listaMapas=new ArrayList<>();
 	private String invitado;
+	private int respuestaJoptionPane;
 	public static int LOGGEO=0;
 	public static int REGISTRAR=1;
 	public static int TRAER_ARCHIVO=2;
@@ -24,10 +26,22 @@ public class UsuarioNuevo implements Serializable{
 	public static int ONLINE=4;
 	public static int DESCONECCION=5;
 	public static int INVITACION=6;
+	public static int COLABORANDO=7;
 	
 	
 	
-	
+	public HashMap<String, String> getColaborador() {
+		return colaborador;
+	}
+	public void setColaborador(HashMap<String, String> colaborador) {
+		this.colaborador = colaborador;
+	}
+	public int getRespuestaJpane() {
+		return respuestaJoptionPane;
+	}
+	public void setRespuestaJpane(int respuestaJpane) {
+		this.respuestaJoptionPane = respuestaJpane;
+	}
 	public String getInvitado() {
 		return invitado;
 	}

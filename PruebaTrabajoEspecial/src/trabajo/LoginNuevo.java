@@ -1,13 +1,10 @@
-package prueba.login.pass.con.hash;
+package trabajo;
 
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import registros.DBusuarios;
-import registros.Usuario;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;

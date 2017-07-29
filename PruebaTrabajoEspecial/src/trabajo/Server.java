@@ -1,4 +1,4 @@
-package prueba.login.pass.con.hash;
+package trabajo;
 
 
 
@@ -200,7 +200,9 @@ class Marco extends JFrame implements Runnable{ //clase que contruye el marco
 						for (HashMap<String, String> mapa : listaMapas) {
 							for(Map.Entry<String, String> entry: mapa.entrySet()){
 								if (entry.getValue().equals(aux.getInvitado())) {
-						
+									HashMap<String, String> aux2=new HashMap<>();
+									aux2.put(entry.getKey(), entry.getValue());
+									aux.setColaborador(aux2);
 									areatexto.append(aux.getUser()+" invito a "+entry.getValue()+"\n");
 									Socket invitacion=new Socket(entry.getKey(), 9090);
 									ObjectOutputStream flujoSalida=new ObjectOutputStream(invitacion.getOutputStream());

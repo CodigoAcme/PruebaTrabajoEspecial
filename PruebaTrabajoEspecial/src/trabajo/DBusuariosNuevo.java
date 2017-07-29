@@ -1,4 +1,4 @@
-package prueba.login.pass.con.hash;
+package trabajo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
